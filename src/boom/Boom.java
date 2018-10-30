@@ -5,10 +5,6 @@
  */
 package boom;
 
-import models.factories.FighterFactory;
-import models.factories.GardianFactory;
-import models.fighters.Fighter;
-import views.Arena;
 
 /**
  *
@@ -21,10 +17,7 @@ public class Boom {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        FighterFactory gardianFactory = new GardianFactory();
-        Fighter gardian = gardianFactory.getGardian();
-        
-        Arena arena = new Arena();
+
     }
     
 }

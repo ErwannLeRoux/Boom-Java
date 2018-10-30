@@ -4,31 +4,35 @@
  * and open the template in the editor.
  */
 package models.factories;
-
-import models.fighters.Fighter;
+import models.element.fighters.Shooter;
+import models.element.fighters.Gardian;
+import models.element.fighters.Bomber;
+import models.element.fighters.Fighter;
 
 /**
  *
  * @author Erwann
  */
-public abstract class FighterFactory {
-    
-    public Fighter getGardian()
-    {
-        return createGardian();
+public class FighterFactory {
+    public FighterFactory(){
+        
     }
     
-    public Fighter getShooter()
-    {
-        return createShooter();
+    public Fighter createFighter(char type ,int pX,int pY, int pEnergy ,String pName,int pNb_shield,int pNb_shot,int pNb_bomb,int pNb_mine){
+        switch (type){
+            case 'G' : return new Gardian(pX,pY,pEnergy,pName,pNb_shield,pNb_shot,pNb_bomb,pNb_mine);
+            case 'S' : return new Shooter(pX,pY,pEnergy,pName,pNb_shield,pNb_shot,pNb_bomb,pNb_mine);
+            case 'B' : return new Bomber(pX,pY,pEnergy,pName,pNb_shield,pNb_shot,pNb_bomb,pNb_mine);
+        }
+        return null;
     }
     
-    public Fighter getWizard()
-    {
-        return createWizard();
+    public Fighter createFighter(String pName,int pX,int pY, char type){
+        switch (type){
+            case 'G' : return new Gardian(pX,pY,pName);
+            case 'S' : return new Shooter(pX,pY,pName);
+            case 'B' : return new Bomber(pX,pY,pName);
+        }
+        return null;
     }
-    
-    protected abstract Fighter createGardian();
-    protected abstract Fighter createShooter();
-    protected abstract Fighter createWizard();
 }
