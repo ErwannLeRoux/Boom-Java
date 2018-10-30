@@ -1,0 +1,29 @@
+
+<project default="run">
+
+<target name="clean">
+	<delete dir="dist"/>
+</target>
+
+
+<target name="compile" depends="clean">
+	<mkdir dir="bin"/>
+	<javac srcdir="src" destdir="bin"/>
+</target>
+
+
+<target name="jar" depends="compile">
+	<mkdir dir="dist"/>
+	<jar destfile="dist/Boom.jar" basedir="bin">
+		<manifest>
+			<attribute name="Main-Class" value="org.sdf.Boom"/>
+		</manifest>
+	</jar>
+</target>
+
+
+<target name="run" depends="jar">
+	<java jar="dist/Boom.jar" fork="true"/>
+</target>
+
+</project>
