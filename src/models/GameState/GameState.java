@@ -8,9 +8,11 @@ package models.gamestate;
 import java.util.ArrayList;
 import java.util.Scanner;
 import models.element.Element;
+import models.element.EnergyShard;
 import models.element.Wall;
 import models.element.explosives.Bomb;
 import models.element.explosives.Explosive;
+import models.element.explosives.Mine;
 import models.element.fighters.*;
 import models.factories.FighterFactory;
 import models.strategies.mapstrat.EnergyStrat;
@@ -116,7 +118,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         {
             if(this.arena[coord.getX()][coord.getY()] != null)
             {
-                if(this.arena[coord.getX()][coord.getY()].getClass() != Wall.class)
+                if(this.arena[coord.getX()][coord.getY()] instanceof Wall)
                 {
                     this.moveFighter(f, coord);
                 }
@@ -130,18 +132,38 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     public void moveFighter(Fighter f,Coord coord)
     {
         Coord current = this.getElementPosition(f);
-        this.arena[coord.getX()][coord.getY()] = f;
+        Element element = this.arena[coord.getX()][coord.getY()];
+        if(element instanceof Bomb) 
+        {
+            this.bomb((Bomb) element);
+        }
+        else if(element instanceof Mine) 
+        {
+            this.mine((Mine) element);
+        }
+        else if(element instanceof EnergyShard)
+        {
+            this.heal(f);
+        }; 
         this.arena[current.getX()][current.getY()] = null;
+        this.arena[coord.getX()][coord.getY()] = f;
         this.notifyObserver(AnimationType.move, f);
     }
 
+    public void heal(Fighter f)
+    {
+        f.setEnergy(f.getEnergy()+50);
+        Coord coord = this.getElementPosition(f);
+        this.arena[coord.getX()][coord.getY()] = null;
+        this.notifyObserver(AnimationType.none,f);
+    }
     
-    public void shoot(Fighter f)
+    public void shoot(Fighter shooter,Fighter target)
     {
         //doStuff
         SoundPlayer player = new SoundPlayer();
        
-        this.notifyObserver(AnimationType.shoot,f);
+        this.notifyObserver(AnimationType.shoot,shooter);
         player.playSound(SoundType.bomb);
         try {    
             System.out.println("sleep");
@@ -150,7 +172,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
             System.out.println("Can't Stop");
         
         }
-        this.notifyObserver(AnimationType.none,f);
+        this.notifyObserver(AnimationType.none,shooter);
     }
     
     public void bomb(Bomb b){
@@ -168,6 +190,23 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         Coord coord = this.getElementPosition(b);
         this.arena[coord.getX()][coord.getY()] = null;
         this.notifyObserver(AnimationType.none,b);
+    }
+    
+    public void mine(Mine m){
+        //doStuff
+        SoundPlayer player = new SoundPlayer();
+       
+        this.notifyObserver(AnimationType.bomb,m);
+        player.playSound(SoundType.bomb);
+        try {    
+            System.out.println("sleep");
+            Thread.sleep(2000);                  
+        } catch (InterruptedException ex) {
+            System.out.println("Can't Stop");
+        }
+        Coord coord = this.getElementPosition(m);
+        this.arena[coord.getX()][coord.getY()] = null;
+        this.notifyObserver(AnimationType.none,m);
     }
     
     public void display()
