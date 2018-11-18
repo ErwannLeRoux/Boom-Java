@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
+
 /**
  *
  * @author Erwann
@@ -25,6 +26,6 @@ public abstract class FighterView extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(image, 0, 0, this);          
+        g.drawImage(image, 0, 0,this.getHeight(),this.getWidth(), this);      
     }
 }

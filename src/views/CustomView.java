@@ -14,9 +14,9 @@ import javax.imageio.ImageIO;
  *
  * @author Erwann
  */
-public class ShooterView extends FighterView {
+public class CustomView extends FighterView {
     
-    public ShooterView(String path) {
+    public CustomView(String path) {
        try {                
           image = ImageIO.read(new File(path));
        } catch (IOException ex) {
