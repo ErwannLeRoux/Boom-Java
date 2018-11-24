@@ -6,16 +6,18 @@
 package models.gamestate;
 
 import java.util.ArrayList;
-import models.element.Element;
+import java.util.Arrays;
+
 import models.element.fighters.Fighter;
 import models.element.explosives.Explosive;
+import models.element.explosives.Mine;
 
 /**
  *
  * @author antoine
  */
 
-public class GameStateProxy implements GetGameState
+public class GameStateProxy extends AbstractModel implements GetGameState 
 {
     Fighter fighter;
     
@@ -32,8 +34,8 @@ public class GameStateProxy implements GetGameState
     public ArrayList<Explosive> getExplosive() 
     {
         ArrayList<Explosive> res = new ArrayList();
-        for(Element[] ligne : game.getArena()){
-            for(Element e:ligne){
+        for(Object[] ligne : game.getArena()){
+            for(Object e:ligne){
                 if(e instanceof Explosive){
                     if(((Explosive) e).getFighter()==this.fighter){
                         res.add((Explosive) e);
@@ -43,4 +45,53 @@ public class GameStateProxy implements GetGameState
         }
         return res;   
     }    
+    
+    @Override
+    public Object[][] getArena()
+    {
+        int len = this.game.getArena().length;
+        
+        Object[][] proxyMap = new Object[len][len];
+        
+        for(int y = 0; y < len; y++)
+        {
+            for(int x = 0; x < len; x++)
+            {
+                proxyMap[x][y] = this.game.getArena()[x][y];
+            }
+        }
+        
+        for(int y = 0; y < proxyMap.length; y++)
+        {
+            for(int x = 0; x < proxyMap.length; x++)
+            {
+               if(proxyMap[x][y] instanceof Explosive)
+               {
+                   if(this.fighter != ((Explosive)proxyMap[x][y]).getFighter())
+                   {
+                       proxyMap[x][y] = null;
+                   }
+               }
+            }
+        }
+        
+      
+        return proxyMap;
+    }
+    
+    public void display()
+    {
+        for(int y = 0; y < this.game.getArena().length; y++) 
+            
+        {
+             for(int x = 0; x < this.game.getArena().length; x++) 
+            {
+                if(this.game.getArena()[x][y] instanceof Explosive)
+                {
+                    System.out.println(this.game.getArena()[x][y]+" in "+(x+","+y)); 
+                }
+                 
+            }
+        }
+    }
 }

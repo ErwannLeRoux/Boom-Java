@@ -1,3 +1,7 @@
+package models.strategies.fighterstrat;
+
+import models.utils.Actions;
+
 public interface FighterStrategy 
 {
     /**

@@ -5,10 +5,13 @@
  */
 package models.gamestate;
 
+
+
+
 /**
  *
  * @author Erwann
  */
 public abstract class AbstractModel {
-    
+    public abstract Object[][] getArena();
 }

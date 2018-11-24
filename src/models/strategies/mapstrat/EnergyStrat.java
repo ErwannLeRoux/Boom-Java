@@ -1,8 +1,9 @@
 package models.strategies.mapstrat;
 
+import java.util.ArrayList;
 import java.util.Random;
-import models.element.Element;
 import models.element.EnergyShard;
+import models.element.fighters.Fighter;
 
 
 /*
@@ -25,9 +26,8 @@ public class EnergyStrat implements MapStrategy {
     }
     //Ici on va placer des pastilles d'energies aleatoirement sur la map
     @Override
-    public Element[][] generateItems(Element[][] map) {
+    public void generateItems(Object[][] map, ArrayList<Fighter> f) {
         Random r = new Random();
-        Element[][] tmp = map;
         int x = 0,y = 0;
         int cpt = 0;
         
@@ -35,13 +35,12 @@ public class EnergyStrat implements MapStrategy {
         {   
             x = 0 + r.nextInt(map.length - 0);
             y = 0 + r.nextInt(map.length - 0);
-            if(tmp[x][y] == null)
+            if(map[x][y] == null)
             {
-               tmp[x][y] = new EnergyShard(); 
+               map[x][y] = new EnergyShard(); 
                cpt++;
             } 
         }
-        return tmp;
     }
     
     

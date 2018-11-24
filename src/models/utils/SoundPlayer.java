@@ -18,14 +18,6 @@ import javax.sound.sampled.DataLine;
  */
 public class SoundPlayer {
     
-    public enum SoundType {
-        shoot,
-        bomb,
-        mine,
-        move,
-        shield,
-    }
-    
     private File file;
     private String shootSound = "resources/sounds/shoot.wav";
     private String bombSound = "resources/sounds/bomb.wav";
@@ -43,7 +35,7 @@ public class SoundPlayer {
         
     }
     
-    public void playSound(SoundPlayer.SoundType sound)
+    public void playSound(Actions.Action sound)
     {
         try {
             this.file = new File("resources/sounds/"+sound+".wav");

@@ -9,18 +9,27 @@ package models.element;
  *
  * @author antoine
  */
-public class Wall extends Element{
+public class Wall{
     
-    boolean destructible;
+    private boolean destructible;
+    private int hp;
    
-    public Wall(int pX,int pY,boolean destructible) {
-        this.x=pY;
-        this.y=pX;
+    public Wall(boolean destructible) {
+
         this.destructible = destructible;   
+        if(destructible)
+        {
+            this.hp = 50;
+        }
     }
     
     public boolean getDestructible()
     {
         return this.destructible;
+    }
+    
+    public int getHp()
+    {
+        return this.hp;
     }
 }

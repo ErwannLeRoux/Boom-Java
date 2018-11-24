@@ -1,7 +1,8 @@
 
 package models.strategies.mapstrat;
 
-import models.element.Element;
+import java.util.ArrayList;
+import models.element.fighters.Fighter;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,5 +15,5 @@ import models.element.Element;
  * @author Erwann
  */
 public interface MapStrategy {
-    public Element[][] generateItems(Element[][] map);
+    public void generateItems(Object[][] map, ArrayList<Fighter> f);
 }

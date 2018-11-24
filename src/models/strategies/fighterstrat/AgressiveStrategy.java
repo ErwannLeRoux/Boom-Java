@@ -1,4 +1,4 @@
-
+package models.strategies.fighterstrat;
 
 public class AgressiveStrategy extends GeneralStrategy
 {

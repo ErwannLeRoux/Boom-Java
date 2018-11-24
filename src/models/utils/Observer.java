@@ -6,8 +6,7 @@
  */
 package models.utils;
 
-import models.element.Element;
-import models.element.explosives.Bomb;
+
 
 
 
@@ -16,5 +15,5 @@ import models.element.explosives.Bomb;
  * @author Erwann
  */
 public interface Observer {
-    public void update(AnimationType anim, Element e);
+    public void update(Actions.Action anim, Object e);
 }

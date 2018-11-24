@@ -5,16 +5,14 @@
  */
 package models.element.fighters;
 
-import java.awt.Color;
-import models.element.Element;
-
+import models.strategies.fighterstrat.FighterStrategy;
 
 /**
  *
  * @author Erwann
  */
 
-public abstract class Fighter extends Element{
+public abstract class Fighter {
     protected int energy;      
     protected String name;     
     protected int nb_bomb;            
@@ -22,10 +20,11 @@ public abstract class Fighter extends Element{
     protected int nb_shot;            
     protected int nb_mine;  
     protected String color;
+    protected FighterStrategy strat;
     //protected FitherStrategy behavior;
    
-    public Fighter(int pEnergy,String pName,int pNb_shield,int pNb_shot,int pNb_bomb,int pNb_mine,String pColor){
-        this(pName,pColor);
+    public Fighter(int pEnergy,String pName,int pNb_shield,int pNb_shot,int pNb_bomb,int pNb_mine,String pColor,FighterStrategy pStrat){
+        this(pName,pColor,pStrat);
         this.energy = pEnergy;
         this.nb_bomb=pNb_bomb;
         this.nb_mine=pNb_mine;
@@ -33,9 +32,15 @@ public abstract class Fighter extends Element{
         this.nb_shot=pNb_shot;
     }
     
-    public Fighter(String pName,String pColor){
+    public Fighter(String pName,String pColor,FighterStrategy strat){
         this.name=pName;
         this.color = pColor;
+        this.strat = strat;
+    }
+    
+    public FighterStrategy getStrat()
+    {
+        return this.strat;
     }
     
     public String getColor()
@@ -68,6 +73,10 @@ public abstract class Fighter extends Element{
     }
 
     public void setEnergy(int energy) {
+        if(energy < this.getEnergy())
+        {
+            System.out.println("OUTCH !! I took damages");
+        }
         this.energy = energy;
     }
 

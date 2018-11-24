@@ -5,8 +5,6 @@
  */
 package models.utils;
 
-import models.element.Element;
-
 
 /**
  *
@@ -15,5 +13,5 @@ import models.element.Element;
 public interface Observable {
     public void addObserver(Observer o);
     public void removeObserver(Observer o);
-    public void notifyObserver(AnimationType anim, Element f);
+    public void notifyObserver(Actions.Action anim, Object f);
 }

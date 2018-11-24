@@ -9,6 +9,6 @@ package models.element;
  *
  * @author antoine
  */
-public class EnergyShard extends Element{
+public class EnergyShard {
     
 }

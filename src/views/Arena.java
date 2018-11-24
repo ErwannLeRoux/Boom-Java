@@ -6,21 +6,20 @@
 package views;
 
 import controllers.AbstractController;
-import java.awt.Color;
 import java.awt.GridLayout;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import models.element.EnergyShard;
-import models.element.Element;
 import models.element.Wall;
 import models.element.explosives.Bomb;
 import models.element.explosives.Mine;
+import models.element.fighters.Bomber;
 import models.element.fighters.Fighter;
+import models.element.fighters.Gardian;
+import models.element.fighters.Shooter;
 import models.gamestate.AbstractModel;
-import models.gamestate.GameState;
-import models.utils.AnimationType;
+import models.utils.Actions;
 import models.utils.Observer;
 
 /**
@@ -43,7 +42,7 @@ public class Arena extends JFrame implements Observer
         
         this.setTitle("Boom v2");
         
-        this.setSize(900, 900);
+        this.setSize(300, 300);
         
         this.setLocationRelativeTo(null);               
 
@@ -54,15 +53,11 @@ public class Arena extends JFrame implements Observer
         this.setVisible(true);
     }
     
-    private JPanel generateMapElement()
-    {
-        return null;
-    }
-
+    
     @Override
-    public void update(AnimationType anim, Element e) {
-        
-        Element[][] map = ((GameState)this.model).getArena();
+    public void update(Actions.Action anim, Object e) {
+
+        Object[][] map = this.model.getArena();
         
         int len = map.length;
         
@@ -73,29 +68,40 @@ public class Arena extends JFrame implements Observer
             for(int x = 0; x < len; x++) {
                 
                 JPanel pane = null;
+                String currentClass = "";
+                //Dessin des Fighters
                 if(map[x][y] instanceof Fighter) {
+                    if(map[x][y] instanceof Bomber)
+                    {
+                        currentClass ="Bomber/";
+                    } else if(map[x][y] instanceof Gardian)
+                    {
+                        currentClass ="Gardian/";
+                    } if(map[x][y] instanceof Shooter) {
+                        currentClass ="Shooter/";
+                    }
                     
                    Fighter current = (Fighter) map[x][y];
-                   if(anim == AnimationType.shoot && current.getColor().equals("Red"))
+                   
+                   if(anim == Actions.Action.shoot && current.getColor().equals(((Fighter)e).getColor()))
                    {
-                        System.out.println("Anim");
-                        pane = new CustomView(rep+current.getColor()+"/shoot"+current.getColor()+".png");     
+                        pane = new CustomView(rep+currentClass+current.getColor()+"/shoot"+current.getColor()+".png");     
                    } else {
-                   pane = new CustomView(rep+current.getColor()+"/soldier"+current.getColor()+".png");
-                   System.out.println(rep+current.getColor()+"/soldier"+current.getColor()+".png");
+                       
+                        pane = new CustomView(rep+currentClass+current.getColor()+"/soldier"+current.getColor()+".png");
                    }
                 } else if(map[x][y] instanceof Bomb) {
                    Bomb current = (Bomb) map[x][y];
                    
-                   if(anim == AnimationType.bomb && current == e)
+                   if(anim == Actions.Action.bomb && current == e)
                    {
-                        System.out.println("Anim");
-                        pane = new CustomView(rep+"bomb_explosion.jpg");     
+                        pane = new CustomView(rep+"Bomb/bomb_explosion.jpg");     
                    } else {
-                   pane = new CustomView(rep+current.getFighter().getColor()+"/bomb"+current.getFighter().getColor()+".png");
+                    
+                   pane = new CustomView(rep+"Bomb/bomb"+current.getFighter().getColor()+".png");
                    }
                 } else if(map[x][y] instanceof EnergyShard) {
-                   pane = new CustomView(rep+"energyShard.jpg");
+                   pane = new CustomView(rep+"energyShard.png");
                 } else if(map[x][y] instanceof Mine) {
                    Mine current = (Mine) map[x][y];
                    pane = new CustomView(rep+current.getFighter().getColor()+"/soldier"+current.getFighter().getColor()+".png");
@@ -103,14 +109,14 @@ public class Arena extends JFrame implements Observer
                    Wall current = (Wall) map[x][y]; 
                    if(current.getDestructible())
                    {
-                    pane = new CustomView(rep+"wallDes.jpg");
+                    pane = new CustomView(rep+"Wall/wallDes.jpg");
                    } else {
-                    pane = new CustomView(rep+"wall.jpg");  
+                    pane = new CustomView(rep+"Wall/wall.jpg");  
                    }  
                 } else {
                     pane = new CustomView(rep+"grass.jpg");
                 }
-                pane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                //pane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 grille.add(pane);
             }
         }
@@ -119,4 +125,6 @@ public class Arena extends JFrame implements Observer
         this.revalidate();
         this.repaint();
     }
+    
+    
 }

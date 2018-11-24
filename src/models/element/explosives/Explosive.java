@@ -5,7 +5,6 @@
  */
 package models.element.explosives;
 
-import models.element.Element;
 import models.element.fighters.Fighter;
 
 /**
@@ -13,7 +12,7 @@ import models.element.fighters.Fighter;
  * @author antoine
  */
 
-public abstract class Explosive extends Element{
+public abstract class Explosive{
     
     protected Fighter fighter;
     protected int cost;
@@ -36,7 +35,7 @@ public abstract class Explosive extends Element{
         return fighter;
     }
     
-    @Override
+    /*@Override
     public String toString(){
         String type;
         if(this instanceof Mine){
@@ -45,6 +44,6 @@ public abstract class Explosive extends Element{
             type="Bomb";
         }
         return "[Type"+this.fighter+","+this.cost+","+this.damage+"]"; 
-    }
+    }*/
 }
 

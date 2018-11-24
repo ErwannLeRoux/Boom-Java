@@ -1,3 +1,4 @@
+package models.strategies.fighterstrat;
 
 public class DefensiveStrategy extends GeneralStrategy{
     

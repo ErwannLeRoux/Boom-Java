@@ -1,9 +1,10 @@
 
 package models.strategies.mapstrat;
 
+import java.util.ArrayList;
 import java.util.Random;
-import models.element.Element;
 import models.element.Wall;
+import models.element.fighters.Fighter;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -27,9 +28,9 @@ public class WallStrat implements MapStrategy {
     }
     
     @Override
-    public Element[][] generateItems(Element[][] map) {
+    public void generateItems(Object[][] map, ArrayList<Fighter> f) {
         Random r = new Random();
-        Element[][] tmp = map;
+        Object[][] tmp = map;
         int x = 0,y = 0;
         int cpt = 0;
         // Murs Indestructibles
@@ -39,7 +40,7 @@ public class WallStrat implements MapStrategy {
            y = 0 + r.nextInt(map.length - 0);
            if(map[x][y] == null)
            {
-               tmp[x][y] = new Wall(x,y,false); 
+               tmp[x][y] = new Wall(false); 
                cpt++;
            } 
         } 
@@ -51,11 +52,9 @@ public class WallStrat implements MapStrategy {
            y = 0 + r.nextInt(map.length - 0);
            if(map[x][y] == null)
            {
-               tmp[x][y] = new Wall(x,y,true); 
+               tmp[x][y] = new Wall(true); 
                cpt++;
            } 
         } 
-        
-        return tmp;
     }   
 }

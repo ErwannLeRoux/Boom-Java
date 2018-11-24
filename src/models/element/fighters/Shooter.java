@@ -5,18 +5,20 @@
  */
 package models.element.fighters;
 
+import models.strategies.fighterstrat.FighterStrategy;
+
 /**
  *
  * @author Erwann
  */
 public class Shooter extends Fighter {
     
-    public Shooter(int pEnergy, String pName, int pNb_shield, int pNb_shot, int pNb_bomb, int pNb_mine, String pColor) {
-        super(pEnergy, pName, pNb_shield, pNb_shot, pNb_bomb, pNb_mine, pColor);
+    public Shooter(int pEnergy, String pName, int pNb_shield, int pNb_shot, int pNb_bomb, int pNb_mine, String pColor,FighterStrategy strat) {
+        super(pEnergy, pName, pNb_shield, pNb_shot, pNb_bomb, pNb_mine, pColor,strat);
     }
     
-    public Shooter(String pName,String pColor){
-        super(pName,pColor);
+    public Shooter(String pName,String pColor,FighterStrategy strat){
+        super(pName,pColor,strat);
         this.energy = 80;
         this.nb_bomb=2;
         this.nb_mine=2;

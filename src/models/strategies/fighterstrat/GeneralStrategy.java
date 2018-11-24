@@ -1,5 +1,8 @@
+package models.strategies.fighterstrat;
 
 import java.util.Random;
+import models.utils.Actions;
+import models.utils.Direction;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -37,25 +40,17 @@ public abstract class GeneralStrategy implements FighterStrategy {
     public Actions doAction() {
         Random r = new Random();
         double random = 0.0 + r.nextDouble() * (1.0 - 0.0);
-        System.out.println(random);
         if(random <= this.move)
         {
-            return Actions.move;
+            return new Actions(Actions.Action.move,Direction.NO_DIR);
         } else if(random <= this.move+this.shot) {
-            return Actions.shot;
+            return new Actions(Actions.Action.shoot,Direction.NO_DIR);
         } else if(random <= this.move+this.shot+this.shield) {
-            return Actions.shield;
+            return new Actions(Actions.Action.shoot,Direction.NO_DIR);
         } else if(random <= this.move+this.shot+this.shield+this.bomb) {
-            return Actions.mine;
+            return new Actions(Actions.Action.mine,Direction.NO_DIR);
         } else {
-            return Actions.bomb;
+            return new Actions(Actions.Action.bomb,Direction.NO_DIR);
         } 
-    }
-    
-    /*@Override
-    public Actions doAction(String objs, String stuff)
-    {
-        return Actions.nothing;
-    }*/
-            
+    }           
 }

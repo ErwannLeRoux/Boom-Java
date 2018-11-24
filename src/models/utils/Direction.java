@@ -3,16 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package models.utils;
 
 /**
  *
  * @author Erwann
  */
-public enum Actions {
-    shot,
-    move,
-    shield,
-    mine,
-    bomb,
-    nothing
+public enum Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT, NO_DIR
 }

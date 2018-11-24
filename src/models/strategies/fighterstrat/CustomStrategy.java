@@ -1,3 +1,6 @@
+package models.strategies.fighterstrat;
+
+import models.utils.Actions;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -11,18 +14,16 @@
  * pas
  * @author Erwann
  */
-public class CustomStrategy extends GeneralStrategy {
+public class CustomStrategy implements FighterStrategy {
     
-    public CustomStrategy(double move, double shot, double shield, double bomb, double mine) {
-        super(move, shot, shield, bomb, mine);
+    public CustomStrategy() {
+ 
     }
 
-    
-    /*
-    public Actions doAction(ArrayList<Elements> objs, ArrayList<Explosives> stuff, int shotNumber)
-    {
-        return Actions.nothing;
+    @Override
+    public Actions doAction() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    */
+    
     
 }

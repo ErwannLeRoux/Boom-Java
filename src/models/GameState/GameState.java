@@ -6,8 +6,8 @@
 package models.gamestate;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
-import models.element.Element;
 import models.element.EnergyShard;
 import models.element.Wall;
 import models.element.explosives.Bomb;
@@ -15,16 +15,20 @@ import models.element.explosives.Explosive;
 import models.element.explosives.Mine;
 import models.element.fighters.*;
 import models.factories.FighterFactory;
+import models.strategies.fighterstrat.AgressiveStrategy;
+import models.strategies.fighterstrat.BalancedStrategy;
+import models.strategies.fighterstrat.DefensiveStrategy;
+import models.strategies.fighterstrat.FighterStrategy;
 import models.strategies.mapstrat.EnergyStrat;
 import models.strategies.mapstrat.MapStrategy;
 import models.strategies.mapstrat.WallStrat;
-import models.utils.AnimationType;
+import models.utils.Actions;
 import models.utils.AvailableColors;
 import models.utils.Coord;
+import models.utils.Direction;
 import models.utils.Observable;
 import models.utils.Observer;
 import models.utils.SoundPlayer;
-import models.utils.SoundPlayer.SoundType;
 
 /**
  *
@@ -33,33 +37,34 @@ import models.utils.SoundPlayer.SoundType;
 public class GameState extends AbstractModel implements GetGameState, Observable
 {
     
-    private ArrayList<Fighter> fighterList;
-    
-    private Element[][] arena;
+    private Object[][] arena;
     
     private ArrayList<Observer> obs;
     
     private FighterFactory factory;
     
-    private int nbPlayers;
+    private ArrayList<Fighter> fighterList;
     
     private int rows;
     
     private AvailableColors colors;
     
-    public GameState(int rows, int nbPlayer)
+    private SoundPlayer player;
+    
+    public GameState(int rows)
     {
         this.colors = new AvailableColors();
         
-        this.arena = new Element[rows][rows];
+        this.player = new SoundPlayer();
+                
+        this.arena = new Object[rows][rows];
         
         this.fighterList = new ArrayList();
 
         this.factory = new FighterFactory();
         
         this.obs = new ArrayList();
-        
-        this.nbPlayers = nbPlayer;
+       
         
         this.rows = rows;
     }
@@ -69,13 +74,17 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         MapStrategy strat = new WallStrat(10,5);
         MapStrategy stratEnergy = new EnergyStrat(2);
         
-        this.arena = strat.generateItems(arena);
-        this.arena = stratEnergy.generateItems(arena);
+        FighterStrategy balanced = new BalancedStrategy();
+        FighterStrategy ag = new AgressiveStrategy();
+        FighterStrategy def = new DefensiveStrategy();
+        
+        strat.generateItems(arena,this.fighterList);
+        stratEnergy.generateItems(arena,this.fighterList);
         colors.getColorsAvailable();
-        Fighter f1 = this.factory.createFighter("Arthur",'G', "Red"); 
-        Fighter f2 = this.factory.createFighter("Arthur",'G', "Blue");  
-        Fighter f3 = this.factory.createFighter("Arthur",'G', "Green");  
-        Fighter f4 = this.factory.createFighter("Arthur",'G', "Yellow");  
+        Fighter f1 = this.factory.createFighter("Arthur",'S', "Red",ag); 
+        Fighter f2 = this.factory.createFighter("Arthur",'S', "Blue",ag);  
+        Fighter f3 = this.factory.createFighter("Arthur",'S', "Green",ag);  
+        Fighter f4 = this.factory.createFighter("Arthur",'S', "Yellow",ag);  
         Explosive b1 = new Bomb(f1);
         Explosive b2 = new Bomb(f2);
         Explosive b3 = new Bomb(f3);
@@ -93,15 +102,81 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         this.arena[1][4] = b4;
         
 
-        this.notifyObserver(AnimationType.none,f1);
+        this.notifyObserver(Actions.Action.nothing,f1);
         
         while(true) {
+            Random r = new Random();
+            int whichFighter = r.nextInt(4 + 1 - 1) + 1; 
+            Fighter current = null;
+            switch(whichFighter)
+            {
+                case 1:
+                    current = f1;
+                    break;
+                case 2:
+                    current = f2;
+                    break;
+                case 3:
+                    current = f3;
+                    break;
+                case 4:
+                    current = f4;
+                    break;
+            }
+            
+            System.out.println("Fighter f"+whichFighter+" has to play");
+            
+           
+            Coord currentCoord = this.getElementPosition(current);
+            Actions ac = current.getStrat().doAction();
+            
+            switch(ac.getAction()) 
+            {
+                case bomb:
+                    System.out.println("Je pose une bombe");
+                    break;
+                case move:
+                    int moveX = r.nextInt(1 + 1 + 1) - 1; 
+                    System.out.println("move X : "+moveX);
+                    int moveY = r.nextInt(1 + 1 + 1) - 1; 
+                    System.out.println("move Y : "+moveY);
+                    this.checkMoveFighter(current,new Coord(currentCoord.getX()+moveX,currentCoord.getY()+moveY));    
+                    break;
+                case shoot:
+                    int chooseDir = r.nextInt(4 + 1 - 1) + 1; 
+                   
+                    switch(chooseDir)
+                    {
+                        case 1:
+                            this.shoot(current,Direction.UP);
+                             System.out.println("UP");
+                            break;
+                        case 2:
+                            this.shoot(current,Direction.RIGHT);
+                             System.out.println("Right");
+                            break;
+                        case 3:
+                            this.shoot(current,Direction.DOWN);
+                             System.out.println("down");
+                            break;
+                        case 4:
+                            this.shoot(current,Direction.LEFT);
+                             System.out.println("left");
+                            break;
+                    }
+                    break;
+                case mine:
+                    System.out.println("Je pose une mine");
+                    //this.mine(m);
+                    break;        
+                case shield:
+                    System.out.println("J'utilise mon shield");
+                    break;
+            }
+                
+            System.out.println("Next ?");
             Scanner sc = new Scanner(System.in);
-            int x = sc.nextInt();
-            int y = sc.nextInt();
-            
-            this.checkMoveFighter(f1,new Coord(x,y));
-            
+            sc.nextLine();
         }   
     }
     
@@ -114,16 +189,18 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         int newX = coord.getX();
         int newY = coord.getY();
         if(Math.abs(currentY - newY) <= 1 && Math.abs(currentX - newX) <= 1
-                && Math.abs(currentY - newY) <= 1 && Math.abs(currentX - newX) <= 1)
+                && Math.abs(currentY - newY) <= 1 && Math.abs(currentX - newX) <= 1
+                && newY >= 0 && newX >= 0 && newY <= this.rows && newX <= this.rows)
         {
             if(this.arena[coord.getX()][coord.getY()] != null)
             {
-                if(this.arena[coord.getX()][coord.getY()] instanceof Wall)
+                if(!(this.arena[coord.getX()][coord.getY()] instanceof Wall) && !(this.arena[coord.getX()][coord.getY()] instanceof Fighter))
                 {
                     this.moveFighter(f, coord);
                 }
+            } else {
+                this.moveFighter(f, coord);
             }
-            this.moveFighter(f,coord);
         } else {
             System.out.println("I can't move, X : "+currentX+",Y : "+currentY);
         }
@@ -132,7 +209,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     public void moveFighter(Fighter f,Coord coord)
     {
         Coord current = this.getElementPosition(f);
-        Element element = this.arena[coord.getX()][coord.getY()];
+        Object element = this.arena[coord.getX()][coord.getY()];
         if(element instanceof Bomb) 
         {
             this.bomb((Bomb) element);
@@ -147,7 +224,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         }; 
         this.arena[current.getX()][current.getY()] = null;
         this.arena[coord.getX()][coord.getY()] = f;
-        this.notifyObserver(AnimationType.move, f);
+        this.notifyObserver(Actions.Action.nothing, f);
     }
 
     public void heal(Fighter f)
@@ -155,60 +232,193 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         f.setEnergy(f.getEnergy()+50);
         Coord coord = this.getElementPosition(f);
         this.arena[coord.getX()][coord.getY()] = null;
-        this.notifyObserver(AnimationType.none,f);
+        this.notifyObserver(Actions.Action.nothing,f);
+        this.player.playSound(Actions.Action.heal);
     }
     
-    public void shoot(Fighter shooter,Fighter target)
+    /**
+     * Cette fonction va permettre de tirer selon une direction et va frapper le premier combattant
+     * rencontre 
+     * @param shooter
+     * @param dir 
+     */
+    public void shoot(Fighter shooter,Direction dir)
     {
-        //doStuff
-        SoundPlayer player = new SoundPlayer();
-       
-        this.notifyObserver(AnimationType.shoot,shooter);
-        player.playSound(SoundType.bomb);
+        this.notifyObserver(Actions.Action.nothing,shooter);
+        player.playSound(Actions.Action.shoot);
+        Coord fighterPosition = this.getElementPosition(shooter);
+        int fighterX = fighterPosition.getX();
+        int fighterY = fighterPosition.getY();
+        switch(dir)
+        {
+            case UP:
+                for(int y = fighterY-1; y >= 0; y--) 
+                {
+                    Object e = this.arena[fighterX][y];
+                    if(e instanceof Fighter)
+                    {
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        break;
+                    }
+                    else if(e instanceof Wall)
+                    {
+                        System.out.println("Nice one, you shooted a wall !");
+                        break;
+                    }
+                }
+                break;
+            case DOWN:
+                for(int y = fighterY+1; y <= this.rows; y++) 
+                {
+                    Object e = this.arena[fighterX][y];
+                    if(e instanceof Fighter)
+                    {
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        break;
+                    }
+                    else if(e instanceof Wall)
+                    {
+                        System.out.println("Nice one, you shooted a wall !");
+                        break;
+                    }
+                }
+                break;
+            case RIGHT:
+                for(int x = fighterX+1; x <= this.rows; x++) 
+                {
+                    Object e = this.arena[x][fighterY];
+                    if(e instanceof Fighter)
+                    {
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        break;
+                    }
+                    else if(e instanceof Wall)
+                    {
+                        System.out.println("Nice one, you shooted a wall !");
+                        break;
+                    }
+                    
+                }
+                break;
+            case LEFT:
+                for(int x = fighterX-1; x >= 0; x--) 
+                {
+                    Object e = this.arena[x][fighterX];
+                    if(e instanceof Fighter)
+                    {
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        break;
+                    }else if(e instanceof Wall)
+                    {
+                        System.out.println("Nice one, you shooted a wall !");
+                        break;
+                    }
+                    
+                }
+                break;
+        }
         try {    
-            System.out.println("sleep");
             Thread.sleep(2000);                  
         } catch (InterruptedException ex) {
-            System.out.println("Can't Stop");
-        
+            System.out.println("Can't Stop");        
         }
-        this.notifyObserver(AnimationType.none,shooter);
+        this.notifyObserver(Actions.Action.nothing,shooter);
     }
     
-    public void bomb(Bomb b){
-        //doStuff
-        SoundPlayer player = new SoundPlayer();
-       
-        this.notifyObserver(AnimationType.bomb,b);
-        player.playSound(SoundType.bomb);
+    public void bomb(Bomb b){       
+        this.notifyObserver(Actions.Action.nothing,b);
+        player.playSound(Actions.Action.bomb);
         try {    
-            System.out.println("sleep");
-            Thread.sleep(2000);                  
+            Thread.sleep(1000);                  
         } catch (InterruptedException ex) {
-            System.out.println("Can't Stop");
+            System.out.println("Error while sleep");
         }
+        //Parcours des cases voisines
         Coord coord = this.getElementPosition(b);
+        ArrayList<Object> elements = this.getVoisins(coord);
+        for(Object e : elements)
+        {
+            if(e instanceof Fighter)
+            {
+                ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 50);
+            }
+        }
+        
         this.arena[coord.getX()][coord.getY()] = null;
-        this.notifyObserver(AnimationType.none,b);
+        this.notifyObserver(Actions.Action.nothing,b);
+    }
+    
+    public ArrayList getVoisins(Coord coord)
+    {
+        //Parcours des cases voisines
+        ArrayList<Object> elements = new ArrayList();
+        int x = coord.getX();
+        int y = coord.getY();
+        if(y - 1 <= 0)
+        {
+           Object top = this.arena[x][y-1]; 
+           elements.add(top);
+           if(x - 1 <= 0)
+           {
+                Object topLeft = this.arena[x-1][y-1];
+                elements.add(topLeft);
+           }
+           if( x + 1 <= this.rows)
+           {
+               Object topRight = this.arena[x+1][y-1];
+               elements.add(topRight);
+           }  
+        }
+        
+        if(y + 1 <= this.rows) 
+        {
+            Object bot = this.arena[x][y+1];
+            elements.add(bot);
+            if(x - 1 <= 0)
+            {
+                Object botLeft = this.arena[x-1][y+1];
+                elements.add(botLeft);
+            }
+            if( x + 1 <= this.rows)
+            {
+                Object botRight = this.arena[x+1][y+1];
+                elements.add(botRight);
+            }
+        }
+        
+        if(x - 1 <= 0)
+        {
+            Object left = this.arena[x-1][y];
+            elements.add(left);
+        }
+        
+        if(x + 1 <= this.rows) 
+        {
+            Object right = this.arena[x+1][y];
+            elements.add(right);
+        }  
+        return elements;
     }
     
     public void mine(Mine m){
         //doStuff
-        SoundPlayer player = new SoundPlayer();
        
-        this.notifyObserver(AnimationType.bomb,m);
-        player.playSound(SoundType.bomb);
+        this.notifyObserver(Actions.Action.nothing,m);
+        player.playSound(Actions.Action.bomb);
         try {    
-            System.out.println("sleep");
             Thread.sleep(2000);                  
         } catch (InterruptedException ex) {
             System.out.println("Can't Stop");
         }
         Coord coord = this.getElementPosition(m);
         this.arena[coord.getX()][coord.getY()] = null;
-        this.notifyObserver(AnimationType.none,m);
+        this.notifyObserver(Actions.Action.nothing,m);
     }
     
+    public FighterFactory getFactory() 
+    {
+        return this.factory;
+    }
     public void display()
     {
         for(int y = 0; y < this.rows; y++) 
@@ -227,7 +437,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
      * @return
      * Retourne les coordonnes de l'element
      */
-    public Coord getElementPosition(Element element)
+    public Coord getElementPosition(Object element)
     {
         for(int y = 0; y < this.arena.length; y++)
         {
@@ -254,7 +464,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     }
 
     @Override
-    public void notifyObserver(AnimationType anim, Element f) {
+    public void notifyObserver(Actions.Action anim, Object f) {
         for(Observer ob : this.obs) {
             ob.update(anim,f);
         }
@@ -265,11 +475,11 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     public ArrayList<Explosive> getExplosive()
     {
         ArrayList<Explosive> res=new ArrayList();
-        for(Element[] ligne:this.arena)
+        for(Object[] ligne:this.arena)
         {
-            for(Element e:ligne)
+            for(Object e:ligne)
             {
-                if(e instanceof Element)
+                if(e instanceof Object)
                 {
                     res.add((Explosive) e);
                 }
@@ -279,13 +489,10 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     }
     
     // GUETTERS
-    
-    public ArrayList<Fighter> getFighter()
-    {
-        return this.fighterList;
-    }
+ 
   
-    public Element[][] getArena()
+    @Override
+    public Object[][] getArena()
     {
         return this.arena;
     }
@@ -293,5 +500,10 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     public ArrayList<Fighter> getFighters()
     {
         return this.fighterList;
+    }
+    
+    public void setFighterList(ArrayList<Fighter> f)
+    {
+        this.fighterList = f;
     }
 }

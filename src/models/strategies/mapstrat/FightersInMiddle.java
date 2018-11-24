@@ -1,6 +1,7 @@
 package models.strategies.mapstrat;
 
-import models.element.Element;
+import java.util.ArrayList;
+import models.element.fighters.Fighter;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -21,8 +22,8 @@ public class FightersInMiddle implements MapStrategy {
     }
     
     @Override
-    public Element[][] generateItems(Element[][] map) {
-        return null;
+    public void generateItems(Object[][] map, ArrayList<Fighter> f) {
+
     }
     
 }

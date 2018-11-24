@@ -5,13 +5,6 @@
  */
 package boom;
 
-import controllers.AbstractController;
-import controllers.IAController;
-import models.gamestate.AbstractModel;
-import models.gamestate.GameState;
-import views.Arena;
-
-
 /**
  *
  * @author Erwann
@@ -27,18 +20,7 @@ public class Boom {
      */
     public static void main(String[] args) {
        
-        // Instanciation du modele
-        AbstractModel game = new GameState(rowsOrCols,players);
-        
-        // Instanciation du Controlleur
-        AbstractController controler = new IAController(game);
-        
-        // Instanciation de la vue
-        Arena arena = new Arena(game,controler);
-        
-        ((GameState)game).addObserver(arena);
-        
-        ((GameState)game).playRandomIA();
-    }
-    
+        Game game = new Game(players,rowsOrCols);
+        game.playRandomIA();
+    }   
 }
