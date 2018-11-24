@@ -6,7 +6,6 @@
 package controllers;
 
 import models.gamestate.AbstractModel;
-import views.Arena;
 
 
 /**
@@ -16,8 +15,6 @@ import views.Arena;
 public class AbstractController {
     
     protected AbstractModel model;
-    
-    protected Arena view;
     
     public AbstractController(AbstractModel model)
     {

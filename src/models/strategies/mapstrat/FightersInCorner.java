@@ -53,8 +53,6 @@ public class FightersInCorner implements MapStrategy {
               map[n-1][0] = f.get(2);
               map[n-1][m-1] = f.get(3);
               break;
-
-
           }
     }
 

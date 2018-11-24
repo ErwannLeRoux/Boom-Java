@@ -7,7 +7,6 @@ package models.gamestate;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
 import models.element.EnergyShard;
 import models.element.Wall;
 import models.element.explosives.Bomb;
@@ -20,6 +19,7 @@ import models.strategies.fighterstrat.BalancedStrategy;
 import models.strategies.fighterstrat.DefensiveStrategy;
 import models.strategies.fighterstrat.FighterStrategy;
 import models.strategies.mapstrat.EnergyStrat;
+import models.strategies.mapstrat.FightersInCorner;
 import models.strategies.mapstrat.MapStrategy;
 import models.strategies.mapstrat.WallStrat;
 import models.utils.Actions;
@@ -29,13 +29,16 @@ import models.utils.Direction;
 import models.utils.Observable;
 import models.utils.Observer;
 import models.utils.SoundPlayer;
+import views.Arena;
 
 /**
  *
  * @author antoine
  */
-public class GameState extends AbstractModel implements GetGameState, Observable
+public class GameState extends AbstractModel implements Observable
 {
+    
+    private String previousAction;
     
     private Object[][] arena;
     
@@ -51,8 +54,12 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     
     private SoundPlayer player;
     
-    public GameState(int rows)
+    private int nbPlayers;
+    
+    public GameState(int rows,int nbPlayers)
     {
+        this.nbPlayers = nbPlayers;
+        
         this.colors = new AvailableColors();
         
         this.player = new SoundPlayer();
@@ -64,63 +71,60 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         this.factory = new FighterFactory();
         
         this.obs = new ArrayList();
-       
         
         this.rows = rows;
-    }
-    
-    public void playRandomIA()
-    {
-        MapStrategy strat = new WallStrat(10,5);
-        MapStrategy stratEnergy = new EnergyStrat(2);
         
         FighterStrategy balanced = new BalancedStrategy();
         FighterStrategy ag = new AgressiveStrategy();
         FighterStrategy def = new DefensiveStrategy();
+
+        if(this.nbPlayers >= 1) {
+            Fighter f1 = this.factory.createFighter("Arthur",'B', "Red",def); 
+            this.fighterList.add(f1);
+        }
+        if(this.nbPlayers >= 2) {
+            Fighter f2 = this.factory.createFighter("Arthur",'B', "Green",def); 
+            this.fighterList.add(f2);
+        }
+        if(this.nbPlayers >= 3) {
+           Fighter f3 = this.factory.createFighter("Arthur",'B', "Blue",def); 
+           this.fighterList.add(f3);
+        }
+        if(this.nbPlayers >= 4) {
+           Fighter f4 = this.factory.createFighter("Arthur",'B', "Yellow",def);  
+           this.fighterList.add(f4);
+        }    
         
+        MapStrategy corners = new FightersInCorner();
+        MapStrategy strat = new WallStrat(10,5);
+        MapStrategy stratEnergy = new EnergyStrat(2);
+        
+        corners.generateItems(arena, fighterList);
         strat.generateItems(arena,this.fighterList);
         stratEnergy.generateItems(arena,this.fighterList);
-        colors.getColorsAvailable();
-        Fighter f1 = this.factory.createFighter("Arthur",'S', "Red",ag); 
-        Fighter f2 = this.factory.createFighter("Arthur",'S', "Blue",ag);  
-        Fighter f3 = this.factory.createFighter("Arthur",'S', "Green",ag);  
-        Fighter f4 = this.factory.createFighter("Arthur",'S', "Yellow",ag);  
-        Explosive b1 = new Bomb(f1);
-        Explosive b2 = new Bomb(f2);
-        Explosive b3 = new Bomb(f3);
-        Explosive b4 = new Bomb(f4);
         
-        
-        this.arena[1][0] = f1;
-        this.arena[2][0] = f2;
-        this.arena[3][0] = f3;
-        this.arena[4][0] = f4;
-        
-        this.arena[1][1] = b1;
-        this.arena[1][2] = b2;
-        this.arena[1][3] = b3;
-        this.arena[1][4] = b4;
-        
-
-        this.notifyObserver(Actions.Action.nothing,f1);
-        
-        while(true) {
+        this.notifyObserver(Actions.Action.nothing,null);
+    }
+    
+    public void playRandomIA()
+    {
+       
             Random r = new Random();
             int whichFighter = r.nextInt(4 + 1 - 1) + 1; 
             Fighter current = null;
             switch(whichFighter)
             {
                 case 1:
-                    current = f1;
+                    current = this.fighterList.get(0);
                     break;
                 case 2:
-                    current = f2;
+                    current = this.fighterList.get(1);
                     break;
                 case 3:
-                    current = f3;
+                    current = this.fighterList.get(2);
                     break;
                 case 4:
-                    current = f4;
+                    current = this.fighterList.get(3);
                     break;
             }
             
@@ -175,9 +179,8 @@ public class GameState extends AbstractModel implements GetGameState, Observable
             }
                 
             System.out.println("Next ?");
-            Scanner sc = new Scanner(System.in);
-            sc.nextLine();
-        }   
+
+        
     }
     
     public void checkMoveFighter(Fighter f, Coord coord)
@@ -244,7 +247,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
      */
     public void shoot(Fighter shooter,Direction dir)
     {
-        this.notifyObserver(Actions.Action.nothing,shooter);
+        this.notifyObserver(Actions.Action.shoot,shooter);
         player.playSound(Actions.Action.shoot);
         Coord fighterPosition = this.getElementPosition(shooter);
         int fighterX = fighterPosition.getX();
@@ -404,7 +407,7 @@ public class GameState extends AbstractModel implements GetGameState, Observable
         //doStuff
        
         this.notifyObserver(Actions.Action.nothing,m);
-        player.playSound(Actions.Action.bomb);
+        player.playSound(Actions.Action.mine);
         try {    
             Thread.sleep(2000);                  
         } catch (InterruptedException ex) {
@@ -471,23 +474,6 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     }
     
     
-    @Override
-    public ArrayList<Explosive> getExplosive()
-    {
-        ArrayList<Explosive> res=new ArrayList();
-        for(Object[] ligne:this.arena)
-        {
-            for(Object e:ligne)
-            {
-                if(e instanceof Object)
-                {
-                    res.add((Explosive) e);
-                }
-            }
-        }    
-        return res;
-    }
-    
     // GUETTERS
  
   
@@ -505,5 +491,10 @@ public class GameState extends AbstractModel implements GetGameState, Observable
     public void setFighterList(ArrayList<Fighter> f)
     {
         this.fighterList = f;
+    }
+    
+    public String getPreviousAction()
+    {
+        return this.previousAction;
     }
 }

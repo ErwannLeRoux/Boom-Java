@@ -5,19 +5,15 @@
  */
 package models.gamestate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import models.element.fighters.Fighter;
 import models.element.explosives.Explosive;
-import models.element.explosives.Mine;
 
 /**
  *
  * @author antoine
  */
 
-public class GameStateProxy extends AbstractModel implements GetGameState 
+public class GameStateProxy extends AbstractModel
 {
     Fighter fighter;
     
@@ -29,22 +25,6 @@ public class GameStateProxy extends AbstractModel implements GetGameState
         
         this.game=pGameState;
     }
-    
-    @Override
-    public ArrayList<Explosive> getExplosive() 
-    {
-        ArrayList<Explosive> res = new ArrayList();
-        for(Object[] ligne : game.getArena()){
-            for(Object e:ligne){
-                if(e instanceof Explosive){
-                    if(((Explosive) e).getFighter()==this.fighter){
-                        res.add((Explosive) e);
-                    }
-                }
-            }
-        }
-        return res;   
-    }    
     
     @Override
     public Object[][] getArena()

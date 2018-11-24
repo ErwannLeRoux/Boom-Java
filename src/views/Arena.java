@@ -6,125 +6,138 @@
 package views;
 
 import controllers.AbstractController;
-import java.awt.GridLayout;
+import controllers.IAController;
+import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import models.element.EnergyShard;
-import models.element.Wall;
-import models.element.explosives.Bomb;
-import models.element.explosives.Mine;
-import models.element.fighters.Bomber;
-import models.element.fighters.Fighter;
-import models.element.fighters.Gardian;
-import models.element.fighters.Shooter;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import models.gamestate.AbstractModel;
 import models.utils.Actions;
+import models.utils.JTableModel;
 import models.utils.Observer;
 
 /**
  *
  * @author Erwann
  */
-public class Arena extends JFrame implements Observer
-{
+public class Arena extends JFrame implements Observer{
+
+    //Reference sur le modele
     AbstractModel model;
-    
+    //Reference sur le controleur
     AbstractController controler;
     
-    private String rep = "resources/imgs/";
+    //Variables de classe
     
-    public Arena(AbstractModel model, AbstractController controler)
-    {             
+    private final boolean isMainArena;
+    
+    private final JTableModel jTablemodel;
+    
+    private final JButton bNext;
+
+    private final JTable jTable;
+    
+    private DefaultListModel dialogs;
+    
+    private SubArena sub;
+    
+    private final String resourcesRep = "resources/imgs/";
+    
+    
+    /**
+     * Constructeur de la JFrame
+     * @param model
+     *  le modele de jeu
+     * @param controler
+     *  le controleur du jeu
+     * @param main
+     *  boolean qui definit si la fenetre est la fenetre principale
+     * @param jtableModel 
+     *  le modele de la JTable contenant les stats
+     */
+    public Arena(AbstractModel model,AbstractController controler,boolean main,JTableModel jtableModel)
+    {
+        this.jTablemodel = jtableModel;
+        
+        this.isMainArena = main;
+        
+        this.bNext = new JButton("Go Next !");
+        
+        this.bNext.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                IAController ia = (IAController) controler;  
+                ia.nextButtonClicked();
+            }
+        });
+        
         this.model = model;
         
         this.controler = controler;
         
-        this.setTitle("Boom v2");
+        this.dialogs = new DefaultListModel();
+        
+        this.jTable = new JTable(this.jTablemodel);
+        
+        this.sub = new SubArena(this.model.getArena());
+        
+        this.setTitle("Boom Boom");
         
         this.setSize(300, 300);
         
         this.setLocationRelativeTo(null);               
 
-        ImageIcon img = new ImageIcon(rep+"wall.jpg");
+        ImageIcon img = new ImageIcon(resourcesRep+"icon.jpg");
         
         this.setIconImage(img.getImage());
                    
         this.setVisible(true);
     }
     
-    
     @Override
     public void update(Actions.Action anim, Object e) {
-
-        Object[][] map = this.model.getArena();
-        
-        int len = map.length;
-        
+        //Suppression du contenu actuel
         this.getContentPane().removeAll();
-        JPanel grille = new JPanel(new GridLayout(len,len));
         
-        for(int y = 0; y < len; y++) {
-            for(int x = 0; x < len; x++) {
-                
-                JPanel pane = null;
-                String currentClass = "";
-                //Dessin des Fighters
-                if(map[x][y] instanceof Fighter) {
-                    if(map[x][y] instanceof Bomber)
-                    {
-                        currentClass ="Bomber/";
-                    } else if(map[x][y] instanceof Gardian)
-                    {
-                        currentClass ="Gardian/";
-                    } if(map[x][y] instanceof Shooter) {
-                        currentClass ="Shooter/";
-                    }
-                    
-                   Fighter current = (Fighter) map[x][y];
-                   
-                   if(anim == Actions.Action.shoot && current.getColor().equals(((Fighter)e).getColor()))
-                   {
-                        pane = new CustomView(rep+currentClass+current.getColor()+"/shoot"+current.getColor()+".png");     
-                   } else {
-                       
-                        pane = new CustomView(rep+currentClass+current.getColor()+"/soldier"+current.getColor()+".png");
-                   }
-                } else if(map[x][y] instanceof Bomb) {
-                   Bomb current = (Bomb) map[x][y];
-                   
-                   if(anim == Actions.Action.bomb && current == e)
-                   {
-                        pane = new CustomView(rep+"Bomb/bomb_explosion.jpg");     
-                   } else {
-                    
-                   pane = new CustomView(rep+"Bomb/bomb"+current.getFighter().getColor()+".png");
-                   }
-                } else if(map[x][y] instanceof EnergyShard) {
-                   pane = new CustomView(rep+"energyShard.png");
-                } else if(map[x][y] instanceof Mine) {
-                   Mine current = (Mine) map[x][y];
-                   pane = new CustomView(rep+current.getFighter().getColor()+"/soldier"+current.getFighter().getColor()+".png");
-                } else if(map[x][y] instanceof Wall) {
-                   Wall current = (Wall) map[x][y]; 
-                   if(current.getDestructible())
-                   {
-                    pane = new CustomView(rep+"Wall/wallDes.jpg");
-                   } else {
-                    pane = new CustomView(rep+"Wall/wall.jpg");  
-                   }  
-                } else {
-                    pane = new CustomView(rep+"grass.jpg");
-                }
-                //pane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                grille.add(pane);
-            }
+        this.sub.setMap(this.model.getArena());
+        //La main Arena possedera les boutons suivant et la JTable des stats
+        if(!this.isMainArena)
+        {
+            this.setContentPane(sub);
+        } 
+        else
+        {
+            JList list = new JList(dialogs); //data has type Object[]
+            list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+            list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+            list.setVisibleRowCount(-1);
+            
+            JPanel eastPart = new JPanel(new BorderLayout());
+            eastPart.add(this.bNext,BorderLayout.NORTH);
+            JScrollPane scrollPane = new JScrollPane(list);
+            
+            eastPart.add(scrollPane,BorderLayout.SOUTH);
+            this.getContentPane().add(this.jTable,BorderLayout.SOUTH);
+            this.getContentPane().add(sub,BorderLayout.CENTER);
+            this.getContentPane().add(eastPart,BorderLayout.EAST);
         }
-        this.add(grille);
-        
+        sub.paintSubArena(anim, e);
         this.revalidate();
         this.repaint();
     }
     
+    public void addDialog(String dialog)
+    {
+        this.dialogs.addElement(dialog);
+    }
     
 }

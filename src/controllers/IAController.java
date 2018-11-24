@@ -6,6 +6,7 @@
 package controllers;
 
 import models.gamestate.AbstractModel;
+import models.gamestate.GameState;
 
 /**
  *
@@ -16,6 +17,12 @@ public class IAController extends AbstractController {
     public IAController(AbstractModel model)
     {
         super(model);
+    }
+    
+    public void nextButtonClicked()
+    {
+        GameState game = (GameState)this.model;
+        game.playRandomIA();
     }
     
     

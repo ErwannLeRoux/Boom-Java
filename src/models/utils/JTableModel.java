@@ -50,7 +50,8 @@ public class JTableModel extends AbstractTableModel{
             case 3:
                 return this.fighterList.get(rowIndex).getNb_bomb();
             case 4:
-                return this.fighterList.get(rowIndex).getNb_mine();    
+                return this.fighterList.get(rowIndex).getNb_mine();   
+           
         }
         return null;
     }
