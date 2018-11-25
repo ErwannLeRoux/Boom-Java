@@ -5,6 +5,7 @@
  */
 package models.element.fighters;
 
+import java.util.HashMap;
 import models.strategies.fighterstrat.FighterStrategy;
 
 /**
@@ -30,6 +31,14 @@ public abstract class Fighter {
         this.nb_mine=pNb_mine;
         this.shield=false;
         this.nb_shot=pNb_shot;
+    }
+    
+     public Fighter(String pName,String pColor, HashMap<String,Integer> pParameter,FighterStrategy strat){
+        this(pName,pColor,strat);
+        this.energy = pParameter.get("energy");
+        this.nb_mine = pParameter.get("nb_mine");
+        this.nb_bomb = pParameter.get("nb_bomb");
+        this.nb_shot = pParameter.get("nb_shot");
     }
     
     public Fighter(String pName,String pColor,FighterStrategy strat){

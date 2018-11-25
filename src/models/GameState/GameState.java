@@ -5,9 +5,13 @@
  */
 package models.gamestate;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import models.element.EnergyShard;
 import models.element.Wall;
 import models.element.explosives.Bomb;
@@ -30,7 +34,9 @@ import models.utils.Coord;
 import models.utils.Direction;
 import models.utils.Observable;
 import models.utils.Observer;
+import models.utils.ParameterParser;
 import models.utils.SoundPlayer;
+import org.json.simple.parser.ParseException;
 import views.Arena;
 
 /**
@@ -60,7 +66,7 @@ public class GameState extends AbstractModel implements Observable
     
     private int damage;
     
-    public GameState(int rows,int nbPlayers,int dmg)
+    public GameState(int rows,int nbPlayers,int dmg,boolean parser)
     {
         this.nbPlayers = nbPlayers;
         
@@ -80,35 +86,113 @@ public class GameState extends AbstractModel implements Observable
         
         this.rows = rows;
         
-        FighterStrategy balanced = new BalancedStrategy();
-        FighterStrategy ag = new AgressiveStrategy();
-        FighterStrategy def = new DefensiveStrategy();
+        //Si on n'utilise pas le parser on genere tout par defaut
+        if(!parser) {
+            FighterStrategy balanced = new BalancedStrategy();
+            FighterStrategy ag = new AgressiveStrategy();
+            FighterStrategy def = new DefensiveStrategy();
 
-        if(this.nbPlayers >= 1) {
-            Fighter f1 = this.factory.createFighter("Arthur",'B', "Red",balanced); 
-            this.fighterList.add(f1);
+            if(this.nbPlayers >= 1) {
+                Fighter f1 = this.factory.createFighter("Arthur",'B', "Red",balanced); 
+                this.fighterList.add(f1);
+            }
+            if(this.nbPlayers >= 2) {
+                Fighter f2 = this.factory.createFighter("Perceval",'B', "Green",balanced); 
+                this.fighterList.add(f2);
+            }
+            if(this.nbPlayers >= 3) {
+               Fighter f3 = this.factory.createFighter("Lancelot",'B', "Blue",balanced); 
+               this.fighterList.add(f3);
+            }
+            if(this.nbPlayers >= 4) {
+               Fighter f4 = this.factory.createFighter("Genievre",'B', "Yellow",balanced);  
+               this.fighterList.add(f4);
+            }    
+
+            MapStrategy corners = new FightersInCorner();
+            MapStrategy middle = new FightersInMiddle();
+            MapStrategy strat = new WallStrat(10,5);
+            MapStrategy stratEnergy = new EnergyStrat(2);
+
+            middle.generateItems(arena, fighterList);
+            strat.generateItems(arena,this.fighterList);
+            stratEnergy.generateItems(arena,this.fighterList);
+        } else {
+            
+            ParameterParser paramParser = null;
+            
+            try {
+                paramParser = new ParameterParser("resources/parameters.json");
+            } catch (IOException | ParseException ex) {
+                System.out.println("Error while parsing");
+            }
+            
+            if(paramParser != null)
+            {
+                HashMap<String,Integer> fighterParam = paramParser.getFighterParameters('B');
+                HashMap<String,Boolean> mapParam = paramParser.getMapStrategyParameters();
+                HashMap<String,Boolean> stratParam = paramParser.getFighterStrategyParameters();
+                
+                ArrayList<MapStrategy> mapStrats = new ArrayList();
+                ArrayList<FighterStrategy> fighterStrats = new ArrayList();
+                
+                if(stratParam.get("DefensiveStrategy"))
+                {
+                    fighterStrats.add(new DefensiveStrategy());
+                }
+                if(stratParam.get("BalancedStrategy"))
+                {
+                    fighterStrats.add(new BalancedStrategy());
+                }
+                if(stratParam.get("AgressiveStrategy"))
+                {
+                    fighterStrats.add(new AgressiveStrategy());
+                }
+                
+                if(mapParam.get("EnergyStrat"))
+                {
+                    mapStrats.add(new EnergyStrat(2));
+                }
+                if(mapParam.get("FightersInCorner"))
+                {
+                    mapStrats.add(new FightersInCorner());
+                } else {
+                    mapStrats.add(new FightersInMiddle());
+                }
+                if(mapParam.get("WallStrat"))
+                {
+                    mapStrats.add(new WallStrat(10,5));
+                }
+                
+                
+                 
+                 Random r = new Random();
+            int whichStrat = 0;
+            if(this.nbPlayers >= 1) {
+                whichStrat = r.nextInt(fighterStrats.size()-1);
+                Fighter f1 = this.factory.createFighter("Arthur",'G', "Red",fighterParam,fighterStrats.get(whichStrat)); 
+                this.fighterList.add(f1);
+            }
+            if(this.nbPlayers >= 2) {
+                Fighter f2 = this.factory.createFighter("Perceval",'B', "Green",fighterParam,fighterStrats.get(whichStrat)); 
+                this.fighterList.add(f2);
+            }
+            if(this.nbPlayers >= 3) {
+               Fighter f3 = this.factory.createFighter("Lancelot",'S', "Blue",fighterParam,fighterStrats.get(whichStrat)); 
+               this.fighterList.add(f3);
+            }
+            if(this.nbPlayers >= 4) {
+               Fighter f4 = this.factory.createFighter("Genievre",'B', "Yellow",fighterParam,fighterStrats.get(whichStrat));  
+               this.fighterList.add(f4);
+            }  
+            
+            for(MapStrategy s : mapStrats)
+                {
+                    s.generateItems(arena, fighterList);
+                }
         }
-        if(this.nbPlayers >= 2) {
-            Fighter f2 = this.factory.createFighter("Perceval",'B', "Green",balanced); 
-            this.fighterList.add(f2);
-        }
-        if(this.nbPlayers >= 3) {
-           Fighter f3 = this.factory.createFighter("Lancelot",'B', "Blue",balanced); 
-           this.fighterList.add(f3);
-        }
-        if(this.nbPlayers >= 4) {
-           Fighter f4 = this.factory.createFighter("Genievre",'B', "Yellow",balanced);  
-           this.fighterList.add(f4);
-        }    
+    }
         
-        MapStrategy corners = new FightersInCorner();
-        MapStrategy middle = new FightersInMiddle();
-        MapStrategy strat = new WallStrat(10,5);
-        MapStrategy stratEnergy = new EnergyStrat(2);
-        
-        middle.generateItems(arena, fighterList);
-        strat.generateItems(arena,this.fighterList);
-        stratEnergy.generateItems(arena,this.fighterList);
         
         this.notifyObserver(Actions.Action.nothing,null);
     }
@@ -208,6 +292,7 @@ public class GameState extends AbstractModel implements Observable
                     this.putMine(current, new Coord(currentCoord.getX()+mineX,currentCoord.getY()+mineY));
                     break;        
                 case shield:
+                    this.previousAction = current.getName()+ " use shield";
                     this.useShield(current);
                     break;
             }

@@ -129,6 +129,7 @@ public class Arena extends JFrame implements Observer{
             JScrollPane scrollPane = new JScrollPane(list);
             
             eastPart.add(scrollPane,BorderLayout.SOUTH);
+            
             this.getContentPane().add(this.jTable,BorderLayout.SOUTH);
             this.getContentPane().add(sub,BorderLayout.CENTER);
             this.getContentPane().add(eastPart,BorderLayout.EAST);

@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package models.factories;
+import java.util.HashMap;
 import models.element.fighters.Shooter;
 import models.element.fighters.Gardian;
 import models.element.fighters.Bomber;
@@ -33,6 +34,15 @@ public class FighterFactory {
             case 'G' : return new Gardian(pName,pColor,strat);
             case 'S' : return new Shooter(pName,pColor,strat);
             case 'B' : return new Bomber(pName,pColor,strat);
+        }
+        return null;
+    }
+    
+    public Fighter createFighter(String pName, char type,String pColor, HashMap<String,Integer> pParameter,FighterStrategy strat){
+        switch (type){
+            case 'G' : return new Gardian(pName,pColor,pParameter,strat);
+            case 'S' : return new Shooter(pName,pColor,pParameter,strat);
+            case 'B' : return new Bomber(pName,pColor,pParameter,strat);
         }
         return null;
     }

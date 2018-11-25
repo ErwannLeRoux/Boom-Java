@@ -31,7 +31,14 @@ public class Boom {
      */
     public static void main(String[] args) {
        
-        GameState model = new GameState(rowsOrCols,players,dmg);
+        GameState model = null;
+        
+        if(args[0].equals("parser"))
+        {
+            model = new GameState(rowsOrCols,players,dmg,true);
+        }else {
+            model = new GameState(rowsOrCols,players,dmg,false);
+        }
         
         JTableModel m = new JTableModel(model.getFighters());
         
