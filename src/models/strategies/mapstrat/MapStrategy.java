@@ -11,7 +11,7 @@ import models.element.fighters.Fighter;
  */
 
 /**
- *
+ * Classe qui va servir a developper les strategies de placement sur la grille
  * @author Erwann
  */
 public interface MapStrategy {

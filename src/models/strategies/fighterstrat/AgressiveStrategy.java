@@ -1,5 +1,9 @@
 package models.strategies.fighterstrat;
 
+/**
+ * Classe qui permet de creer une strategie agressive
+ * @author Erwann
+ */
 public class AgressiveStrategy extends GeneralStrategy
 {
     /**

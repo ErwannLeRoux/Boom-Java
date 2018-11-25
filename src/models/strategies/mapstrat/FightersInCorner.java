@@ -11,7 +11,7 @@ import models.element.fighters.Fighter;
  */
 
 /**
- *
+ * Permet de definir la strategie de placement des joueurs : dans les coins
  * @author Erwann
  */
 public class FightersInCorner implements MapStrategy {

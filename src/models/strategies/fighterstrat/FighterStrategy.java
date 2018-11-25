@@ -2,6 +2,10 @@ package models.strategies.fighterstrat;
 
 import models.utils.Actions;
 
+/**
+ * Interface qui va servir au developpement des strategies
+ * @author Erwann
+ */
 public interface FighterStrategy 
 {
     /**
@@ -10,5 +14,4 @@ public interface FighterStrategy
      *  Retourne l'action que le combattant doit realiser
      */
     public Actions doAction();
-    //public Actions doAction(ArrayList<Elements> objs, ArrayList<Explosives> stuff, int shotNumber);
 }

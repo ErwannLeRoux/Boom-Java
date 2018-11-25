@@ -1,5 +1,9 @@
 package models.strategies.fighterstrat;
 
+/**
+ * Classe permettant de creer une strategie defensive
+ * @author Erwann
+ */
 public class DefensiveStrategy extends GeneralStrategy{
     
     public DefensiveStrategy() {

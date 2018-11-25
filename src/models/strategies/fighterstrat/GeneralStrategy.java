@@ -11,7 +11,7 @@ import models.utils.Direction;
  */
 
 /**
- * 
+ * Classe permettant de definir le fonctionnement global des strategies par defaut
  * @author Erwann
  */
 public abstract class GeneralStrategy implements FighterStrategy {
@@ -22,6 +22,19 @@ public abstract class GeneralStrategy implements FighterStrategy {
     protected double mine;
     protected double bomb;
             
+    /**
+     * Le constructeur d'une strategie
+     * @param move
+     *  le pourcentage de chance qu'un joueur se deplace
+     * @param shot
+     * le pourcentage de chance qu'un joueur tire
+     * @param shield
+     * le pourcentage de chance qu'un joueur utilise son bouclier
+     * @param bomb
+     * le pourcentage de chance qu'un joueur pose une bombe
+     * @param mine 
+     * le pourcentage de chance qu'un joueur pose une mine
+     */
     public GeneralStrategy(double move, double shot, double shield, double bomb, double mine)
     {
         this.move = move;

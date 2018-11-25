@@ -13,13 +13,17 @@ import models.element.fighters.Fighter;
  */
 
 /**
- *
+ * Permet de definir la strategie de placement des pastilles d'energies
  * @author Erwann
  */
 public class EnergyStrat implements MapStrategy {
 
     int energyNb;
     
+    /**
+     * Constructeur qui va definir le nombre de pastilles a placer
+     * @param pNumber 
+     */
     public EnergyStrat(int pNumber)
     {
         this.energyNb = pNumber;

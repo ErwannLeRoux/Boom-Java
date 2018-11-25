@@ -10,7 +10,7 @@ import models.element.fighters.Fighter;
  */
 
 /**
- *
+ * Permet de definir la strategie de placement des joueurs : au milieu
  * @author Erwann
  */
 public class FightersInMiddle implements MapStrategy {

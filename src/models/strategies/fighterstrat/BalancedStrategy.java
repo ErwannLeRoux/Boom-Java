@@ -7,7 +7,7 @@ package models.strategies.fighterstrat;
  */
 
 /**
- *
+ * Permet de creer une strategie equilibre
  * @author Erwann
  */
 public class BalancedStrategy extends GeneralStrategy {

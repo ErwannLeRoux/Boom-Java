@@ -13,7 +13,7 @@ import models.element.fighters.Fighter;
  */
 
 /**
- *
+ * Classe qui permet definir la strategie de placement des murs
  * @author Erwann
  */
 public class WallStrat implements MapStrategy {
@@ -22,6 +22,13 @@ public class WallStrat implements MapStrategy {
     
     private int nbdestructibles;
     
+    /**
+     * Constructeur des murs
+     * @param pNumber
+     *  le nombre de murs destructibles qu'on souhaite placer
+     * @param nbdestructibles 
+     *  le nombre de murs indestructibles qu'on souhaite placer
+     */
     public WallStrat(int pNumber, int nbdestructibles) {
        this.wallNumber = pNumber; 
        this.nbdestructibles = nbdestructibles;
