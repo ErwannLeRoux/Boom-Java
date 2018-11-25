@@ -19,12 +19,19 @@ public class AvailableColors {
     
     private File[] files;
     
+    /**
+     * Constructeur de l'utilitaire de recuperation des couleurs disponibles
+     */
     public AvailableColors()
     {
         this.folder = new File("resources/imgs/");
         this.files = folder.listFiles(); 
     }
     
+    /**
+     * Recupere les couleurs disponibles
+     * @return 
+     */
     public ArrayList<String> getColorsAvailable()
     {        
         ArrayList<String> colors = new ArrayList();

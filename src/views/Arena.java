@@ -26,7 +26,7 @@ import models.utils.JTableModel;
 import models.utils.Observer;
 
 /**
- *
+ * Classe qui permet de creer l'interface graphique
  * @author Erwann
  */
 public class Arena extends JFrame implements Observer{
@@ -104,6 +104,13 @@ public class Arena extends JFrame implements Observer{
         this.setVisible(true);
     }
     
+    /**
+     * Methode qui va se lancer quand notre classe sera notifie d'un changement par le modele
+     * @param anim
+     *  l'animation a jouer ( tir, bombe, etc..)
+     * @param e 
+     *  l'objet sur lequel jouer l'animation
+     */
     @Override
     public void update(Actions.Action anim, Object e) {
         //Suppression du contenu actuel
@@ -140,6 +147,11 @@ public class Arena extends JFrame implements Observer{
         this.repaint();
     }
     
+    /**
+     * Permet d'ajouter un texte a la fenetre de dialogue sur la frame principale
+     * @param dialog 
+     *  l'action qui a ete execute par un joueur
+     */
     public void addDialog(String dialog)
     {
         if(!dialog.equals(""))

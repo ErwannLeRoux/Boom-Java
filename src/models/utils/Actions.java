@@ -10,11 +10,14 @@ package models.utils;
  */
 
 /**
- *
+ * Classe permettant de representer une action ( direction et action)
  * @author Erwann
  */
 public class Actions {
     
+    /**
+     * la lisre d'actions disponibles
+     */
     public enum Action {
         shoot,
         move,
@@ -29,6 +32,13 @@ public class Actions {
     
     private Action action;
     
+    /**
+     * Constructeur d'une action
+     * @param action
+     *  l'action a realiser
+     * @param dir 
+     *  la direction dans laquelle realiser l'action
+     */
     public Actions(Action action,Direction dir)
     {
         this.dir = dir;

@@ -18,7 +18,7 @@ import models.element.fighters.Shooter;
 import models.utils.Actions;
 
 /**
- *
+ * Classe qui va permettre de dessiner l'arene des combattants
  * @author Erwann
  */
 public class SubArena extends JPanel {
@@ -27,6 +27,11 @@ public class SubArena extends JPanel {
     
     private String rep = "resources/imgs/";
     
+    /**
+     * Constructeur de la vue qui va inititialiser le layout et le tableau d'elements
+     * @param map
+     *  le tableau d'objet representant la grille et ses elements
+     */
     public SubArena(Object[][] map)
     {
         this.map = map;
@@ -34,6 +39,13 @@ public class SubArena extends JPanel {
         this.setLayout(new GridLayout(map.length,map.length));
     }
     
+    /**
+     * Methode qui permet de dessiner la grille et tous ses elements
+     * @param anim
+     *  l'animation a jouer si il y en a unes
+     * @param e 
+     *  l'objet sur lequel jouer l'animation
+     */
     public void paintSubArena(Actions.Action anim,Object e)
     {
         this.removeAll();
@@ -100,6 +112,11 @@ public class SubArena extends JPanel {
         }    
     }
     
+    /**
+     * Permet de mettre a jour le tableau d'objets
+     * @param newMap 
+     *  le nouveau tableau d'objets
+     */
     public void setMap(Object[][] newMap)
     {
         this.map = newMap;

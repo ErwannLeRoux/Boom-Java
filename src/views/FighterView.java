@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 
 /**
- *
+ * Classe abstraite qui permet de definir la façon dont on dessine une case 
  * @author Erwann
  */
 public abstract class FighterView extends JPanel {

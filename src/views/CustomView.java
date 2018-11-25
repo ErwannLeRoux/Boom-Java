@@ -11,7 +11,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * Classe permetant de definir quelle image contient notre vue, par exemple
+ * un mur, une pastille d'energie, une bombe ou encore une mine
  * @author Erwann
  */
 public class CustomView extends FighterView {

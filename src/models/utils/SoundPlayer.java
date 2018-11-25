@@ -13,7 +13,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 
 /**
- *
+ * Classe permettant de jouer un son 
  * @author Erwann
  */
 public class SoundPlayer {
@@ -35,6 +35,11 @@ public class SoundPlayer {
         
     }
     
+    /**
+     * Classe permettant de joueur un son
+     * @param sound 
+     *  le son a jouer
+     */
     public void playSound(Actions.Action sound)
     {
         try {

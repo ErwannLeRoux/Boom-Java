@@ -11,7 +11,7 @@ package models.utils;
 
 
 /**
- *
+ * Classe permettant de donner a une classe la capacite d'en observer une autre
  * @author Erwann
  */
 public interface Observer {

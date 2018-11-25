@@ -7,7 +7,7 @@ package models.utils;
 
 
 /**
- *
+ * Classe permettant de rendre une classe Observable
  * @author Erwann
  */
 public interface Observable {

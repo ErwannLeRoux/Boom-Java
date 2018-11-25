@@ -6,7 +6,7 @@
 package models.utils;
 
 /**
- *
+ *  Classe permettant de representer une coordonnee ( x et y )
  * @author Erwann
  */
 public class Coord {
@@ -14,6 +14,13 @@ public class Coord {
     private int x;
     private int y;
     
+    /**
+     * Constructeur d'une coordonnee
+     * @param x
+     *  la coordonnee x
+     * @param y 
+     *  la coordonnee y
+     */
     public Coord(int x, int y)
     {
         this.x = x;

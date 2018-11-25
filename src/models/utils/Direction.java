@@ -6,7 +6,7 @@
 package models.utils;
 
 /**
- *
+ * Enum permettant de definir une direction
  * @author Erwann
  */
 public enum Direction {

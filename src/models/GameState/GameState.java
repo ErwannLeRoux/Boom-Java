@@ -40,8 +40,8 @@ import org.json.simple.parser.ParseException;
 import views.Arena;
 
 /**
- *
- * @author antoine
+ * Classe qui permet de representer le jeu
+ * @author Erwann
  */
 public class GameState extends AbstractModel implements Observable
 {
@@ -66,6 +66,17 @@ public class GameState extends AbstractModel implements Observable
     
     private int damage;
     
+    /**
+     * Constructeur d'un jeu
+     * @param rows
+     *  le nombre de lignes,colonnes
+     * @param nbPlayers
+     *  le nombre de joueurs
+     * @param dmg
+     *  les degats qu'infligent un tir une bombe ou une mine
+     * @param parser 
+     *  true si on utiliser le parser, sinon false et on lance le jeu avec des parametres par defaut
+     */
     public GameState(int rows,int nbPlayers,int dmg,boolean parser)
     {
         this.nbPlayers = nbPlayers;
@@ -200,6 +211,11 @@ public class GameState extends AbstractModel implements Observable
     }
     
     
+    /**
+     * Permet de verifier si les conditions de victoires sont satisfaites
+     * @return 
+     *  true si le jeu est termine sinon false
+     */
     public boolean checkEnd()
     {
         Iterator<Fighter> it = this.fighterList.iterator() ;
@@ -227,6 +243,9 @@ public class GameState extends AbstractModel implements Observable
         }
     }
     
+    /**
+     * Permet de lancer une partie qui fait jouer des robots
+     */
     public void playRandomIA()
     {
         this.timerBomb();
@@ -304,16 +323,26 @@ public class GameState extends AbstractModel implements Observable
         
     }
     
+    /**
+     * Permet de reinitialiser le message de l'action precedente
+     */
     public void resetMsg()
     {
         this.previousAction = "";
     }
     
+    /**
+     * Permet de modifier le nombre de joueurs restants
+     * @param nb 
+     */
     public void setNbPlayers(int nb)
     {
         this.nbPlayers = nb;
     }
     
+    /**
+     * Permet de desactiver les boucliers a la fin d'un tour
+     */
     public void resetShield()
     {
         for(Fighter f : this.fighterList)
@@ -368,11 +397,23 @@ public class GameState extends AbstractModel implements Observable
         }
     }
     
+    /**
+     * Permet d'activer le bouclier
+     * @param f 
+     *  le joueur qui a activer son bouclier
+     */
     public void useShield(Fighter f)
     {
         f.setShield(true);
     }
     
+    /**
+     * Permet de deposer une mine
+     * @param f
+     *  le joueur qui depose la mine
+     * @param c 
+     *  l'emplacement ou il veut deposer la mine
+     */
     public void putMine(Fighter f,Coord c)
     {
         if(c.getX() >= 0 && c.getX() < this.rows && c.getY() >= 0 && c.getY() < this.rows ){
@@ -390,6 +431,13 @@ public class GameState extends AbstractModel implements Observable
         
     }
     
+    /**
+     * Permet de deposer une bombe
+     * @param f
+     *  le joueur qui depose la bombe
+     * @param c 
+     *  l'emplacement ou la bombe doit etre deposee
+     */
     public void putBomb(Fighter f,Coord c)
     {
         if(c.getX() >= 0 && c.getX() < this.rows && c.getY() >= 0 && c.getY() < this.rows )
@@ -542,6 +590,11 @@ public class GameState extends AbstractModel implements Observable
         this.notifyObserver(Actions.Action.nothing,shooter);
     }
     
+    /**
+     * Permet de faire exploser une bombe
+     * @param b 
+     *  la bombe a faire exploser
+     */
     public void bomb(Bomb b){       
         this.notifyObserver(Actions.Action.bomb,b);
         this.resetMsg();
@@ -566,6 +619,13 @@ public class GameState extends AbstractModel implements Observable
         this.notifyObserver(Actions.Action.nothing,b);
     }
     
+    /**
+     * Permet de recuperer les coordonnes des 8 cases voisines
+     * @param coord
+     *  la case dont on veut recuperer les voisines
+     * @return 
+     *  la liste des coordonnes des cases voisines
+     */
     public ArrayList getVoisins(Coord coord)
     {
         //Parcours des cases voisines
@@ -695,17 +755,34 @@ public class GameState extends AbstractModel implements Observable
         return null;
     }
     
+    /**
+     * Permet d'ajouter un observer
+     * @param o 
+     *  l'observeur a ajouter
+     */
     @Override
     public void addObserver(Observer o) {
         this.obs.add(o);
         
     }
-
+    
+    /**
+     * Permet de supprimer un observer
+     * @param o 
+     *  l'observer a supprimer
+     */
     @Override
     public void removeObserver(Observer o) {
         this.obs.remove(o);
     }
-
+    
+    /**
+     * Permet de notifier tous les observers d'un changement possiblement accompagne d'une animations
+     * @param anim
+     *  l'animation a jouer si il y en a une
+     * @param f 
+     *  le joueur ou l'objet qui doit realiser l'animation
+     */
     @Override
     public void notifyObserver(Actions.Action anim, Object f) {
         for(Observer ob : this.obs) {
