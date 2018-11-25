@@ -20,11 +20,11 @@ public class Mine extends Explosive{
         super(pFighter);
         
         this.cost=5;
-        this.damage=10;
+
     }
     
-    public Mine(Fighter pFighter, int pCost, int pDamage) {
-        super(pFighter, pCost, pDamage);
+    public Mine(Fighter pFighter, int pCost) {
+        super(pFighter, pCost);
     }
 }
 

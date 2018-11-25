@@ -16,7 +16,6 @@ public abstract class Explosive{
     
     protected Fighter fighter;
     protected int cost;
-    protected int damage;
     protected boolean visible;
     
     public Explosive(Fighter pFighter){
@@ -24,15 +23,19 @@ public abstract class Explosive{
         this.fighter=pFighter;
     }
     
-    public Explosive(Fighter pFighter, int pCost,int pDamage){
+    public Explosive(Fighter pFighter, int pCost){
         this(pFighter);
         this.cost=pCost;
-        this.damage=pDamage;
         this.visible=false;
     }
 
     public Fighter getFighter() {
         return fighter;
+    }
+    
+    public int getCost()
+    {
+        return this.cost;
     }
     
     /*@Override

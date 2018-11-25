@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import models.gamestate.AbstractModel;
+import models.gamestate.GameState;
 import models.utils.Actions;
 import models.utils.JTableModel;
 import models.utils.Observer;
@@ -39,11 +40,11 @@ public class Arena extends JFrame implements Observer{
     
     private final boolean isMainArena;
     
-    private final JTableModel jTablemodel;
+    private JTableModel jTablemodel;
     
     private final JButton bNext;
 
-    private final JTable jTable;
+    private JTable jTable;
     
     private DefaultListModel dialogs;
     
@@ -116,6 +117,8 @@ public class Arena extends JFrame implements Observer{
         } 
         else
         {
+            this.jTablemodel = new JTableModel(((GameState)this.model).getFighters());
+            this.jTable = new JTable(jTablemodel);
             JList list = new JList(dialogs); //data has type Object[]
             list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
             list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -129,6 +132,7 @@ public class Arena extends JFrame implements Observer{
             this.getContentPane().add(this.jTable,BorderLayout.SOUTH);
             this.getContentPane().add(sub,BorderLayout.CENTER);
             this.getContentPane().add(eastPart,BorderLayout.EAST);
+            this.addDialog(((GameState)this.model).getPreviousAction());
         }
         sub.paintSubArena(anim, e);
         this.revalidate();
@@ -137,7 +141,11 @@ public class Arena extends JFrame implements Observer{
     
     public void addDialog(String dialog)
     {
-        this.dialogs.addElement(dialog);
+        if(!dialog.equals(""))
+        {
+            this.dialogs.addElement(dialog);
+        }
+        
     }
     
 }

@@ -12,13 +12,27 @@ import models.element.fighters.Fighter;
  * @author antoine
  */
 public class Bomb extends Explosive{
+    
+    private int nbTour;
+    
     public Bomb(Fighter pFighter){
         super(pFighter);
-        this.cost=5;
-        this.damage=20;
+        this.cost = 5;
+        this.nbTour = 3;
     }
     
-    public Bomb(Fighter pFighter, int pCost, int pDamage) {
-        super(pFighter, pCost, pDamage);
+    public Bomb(Fighter pFighter, int pCost, int nbtour) {
+        super(pFighter, pCost);
+        this.nbTour = nbtour;
+    }
+    
+    public void addTour()
+    {
+        this.nbTour--;
+    }
+    
+    public int getTour()
+    {
+        return this.nbTour;
     }
 }

@@ -6,6 +6,7 @@
 package models.gamestate;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 import models.element.EnergyShard;
 import models.element.Wall;
@@ -20,6 +21,7 @@ import models.strategies.fighterstrat.DefensiveStrategy;
 import models.strategies.fighterstrat.FighterStrategy;
 import models.strategies.mapstrat.EnergyStrat;
 import models.strategies.mapstrat.FightersInCorner;
+import models.strategies.mapstrat.FightersInMiddle;
 import models.strategies.mapstrat.MapStrategy;
 import models.strategies.mapstrat.WallStrat;
 import models.utils.Actions;
@@ -38,7 +40,7 @@ import views.Arena;
 public class GameState extends AbstractModel implements Observable
 {
     
-    private String previousAction;
+    private String previousAction = "";
     
     private Object[][] arena;
     
@@ -56,9 +58,13 @@ public class GameState extends AbstractModel implements Observable
     
     private int nbPlayers;
     
-    public GameState(int rows,int nbPlayers)
+    private int damage;
+    
+    public GameState(int rows,int nbPlayers,int dmg)
     {
         this.nbPlayers = nbPlayers;
+        
+        this.damage = dmg;
         
         this.colors = new AvailableColors();
         
@@ -79,38 +85,68 @@ public class GameState extends AbstractModel implements Observable
         FighterStrategy def = new DefensiveStrategy();
 
         if(this.nbPlayers >= 1) {
-            Fighter f1 = this.factory.createFighter("Arthur",'B', "Red",def); 
+            Fighter f1 = this.factory.createFighter("Arthur",'B', "Red",balanced); 
             this.fighterList.add(f1);
         }
         if(this.nbPlayers >= 2) {
-            Fighter f2 = this.factory.createFighter("Arthur",'B', "Green",def); 
+            Fighter f2 = this.factory.createFighter("Perceval",'B', "Green",balanced); 
             this.fighterList.add(f2);
         }
         if(this.nbPlayers >= 3) {
-           Fighter f3 = this.factory.createFighter("Arthur",'B', "Blue",def); 
+           Fighter f3 = this.factory.createFighter("Lancelot",'B', "Blue",balanced); 
            this.fighterList.add(f3);
         }
         if(this.nbPlayers >= 4) {
-           Fighter f4 = this.factory.createFighter("Arthur",'B', "Yellow",def);  
+           Fighter f4 = this.factory.createFighter("Genievre",'B', "Yellow",balanced);  
            this.fighterList.add(f4);
         }    
         
         MapStrategy corners = new FightersInCorner();
+        MapStrategy middle = new FightersInMiddle();
         MapStrategy strat = new WallStrat(10,5);
         MapStrategy stratEnergy = new EnergyStrat(2);
         
-        corners.generateItems(arena, fighterList);
+        middle.generateItems(arena, fighterList);
         strat.generateItems(arena,this.fighterList);
         stratEnergy.generateItems(arena,this.fighterList);
         
         this.notifyObserver(Actions.Action.nothing,null);
     }
     
+    
+    public boolean checkEnd()
+    {
+        Iterator<Fighter> it = this.fighterList.iterator() ;
+        while(it.hasNext()){
+            Fighter o = it.next();   
+            if(o.getEnergy() <= 0)
+            {
+                Coord c = this.getElementPosition(o);
+                int x = c.getX();
+                int y = c.getY();
+                this.arena[x][y] = null;
+                
+                it.remove();
+                this.setNbPlayers(this.fighterList.size());
+            }
+        }    
+
+            
+        if(this.fighterList.size() == 1)
+        {
+            this.previousAction = this.fighterList.get(0).getName()+" won !";
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     public void playRandomIA()
     {
-       
+        this.timerBomb();
+        
             Random r = new Random();
-            int whichFighter = r.nextInt(4 + 1 - 1) + 1; 
+            int whichFighter = r.nextInt(this.nbPlayers + 1 - 1) + 1; 
             Fighter current = null;
             switch(whichFighter)
             {
@@ -128,61 +164,83 @@ public class GameState extends AbstractModel implements Observable
                     break;
             }
             
-            System.out.println("Fighter f"+whichFighter+" has to play");
-            
-           
             Coord currentCoord = this.getElementPosition(current);
             Actions ac = current.getStrat().doAction();
             
             switch(ac.getAction()) 
             {
                 case bomb:
-                    System.out.println("Je pose une bombe");
+                    this.previousAction = current.getName()+ " tried to put a bomb";
+                    int bombX = r.nextInt(1 + 1 + 1) - 1; 
+                    int bombY = r.nextInt(1 + 1 + 1) - 1;
+                    this.putBomb(current, new Coord(currentCoord.getX()+bombX,currentCoord.getY()+bombY));
                     break;
                 case move:
+                    this.previousAction = current.getName()+ " tried to move";
                     int moveX = r.nextInt(1 + 1 + 1) - 1; 
-                    System.out.println("move X : "+moveX);
                     int moveY = r.nextInt(1 + 1 + 1) - 1; 
-                    System.out.println("move Y : "+moveY);
                     this.checkMoveFighter(current,new Coord(currentCoord.getX()+moveX,currentCoord.getY()+moveY));    
                     break;
                 case shoot:
-                    int chooseDir = r.nextInt(4 + 1 - 1) + 1; 
+                    this.previousAction = current.getName()+ " tried to shoot";
+                    int chooseDir = r.nextInt(this.nbPlayers + 1 - 1) + 1; 
                    
                     switch(chooseDir)
                     {
                         case 1:
                             this.shoot(current,Direction.UP);
-                             System.out.println("UP");
                             break;
                         case 2:
                             this.shoot(current,Direction.RIGHT);
-                             System.out.println("Right");
                             break;
                         case 3:
                             this.shoot(current,Direction.DOWN);
-                             System.out.println("down");
                             break;
                         case 4:
                             this.shoot(current,Direction.LEFT);
-                             System.out.println("left");
                             break;
                     }
                     break;
                 case mine:
-                    System.out.println("Je pose une mine");
-                    //this.mine(m);
+                    this.previousAction = current.getName()+ " tried to put a mine";
+                    int mineX = r.nextInt(1 + 1 + 1) - 1; 
+                    int mineY = r.nextInt(1 + 1 + 1) - 1;
+                    this.putMine(current, new Coord(currentCoord.getX()+mineX,currentCoord.getY()+mineY));
                     break;        
                 case shield:
-                    System.out.println("J'utilise mon shield");
+                    this.useShield(current);
                     break;
             }
-                
-            System.out.println("Next ?");
-
+            this.resetMsg();
+            this.resetShield();
+            this.checkEnd();
         
     }
     
+    public void resetMsg()
+    {
+        this.previousAction = "";
+    }
+    
+    public void setNbPlayers(int nb)
+    {
+        this.nbPlayers = nb;
+    }
+    
+    public void resetShield()
+    {
+        for(Fighter f : this.fighterList)
+        {
+            f.setShield(false);
+        }
+    }
+    /**
+     * Permet de verifier si un deplacement est possible
+     * @param f
+     *  le joueur qui veut se deplacer
+     * @param coord 
+     *  l'emplacement ou il veut se deplacer
+     */
     public void checkMoveFighter(Fighter f, Coord coord)
     {
         Coord current = this.getElementPosition(f);
@@ -193,11 +251,25 @@ public class GameState extends AbstractModel implements Observable
         int newY = coord.getY();
         if(Math.abs(currentY - newY) <= 1 && Math.abs(currentX - newX) <= 1
                 && Math.abs(currentY - newY) <= 1 && Math.abs(currentX - newX) <= 1
-                && newY >= 0 && newX >= 0 && newY <= this.rows && newX <= this.rows)
+                && newY >= 0 && newX >= 0 && newY < this.rows && newX < this.rows)
         {
-            if(this.arena[coord.getX()][coord.getY()] != null)
+            Object ob = this.arena[coord.getX()][coord.getY()];
+            
+            if(ob != null)
             {
-                if(!(this.arena[coord.getX()][coord.getY()] instanceof Wall) && !(this.arena[coord.getX()][coord.getY()] instanceof Fighter))
+                if(ob instanceof Explosive)
+                {
+                    if(ob instanceof Bomb)
+                    {
+                        this.bomb((Bomb) ob);
+                    }
+                    if(ob instanceof Mine)
+                    {
+                        this.mine((Mine) ob);
+                    }
+                    this.moveFighter(f, coord);
+                }
+                if(!(ob instanceof Wall) && !(ob instanceof Fighter))
                 {
                     this.moveFighter(f, coord);
                 }
@@ -209,6 +281,51 @@ public class GameState extends AbstractModel implements Observable
         }
     }
     
+    public void useShield(Fighter f)
+    {
+        f.setShield(true);
+    }
+    
+    public void putMine(Fighter f,Coord c)
+    {
+        if(c.getX() >= 0 && c.getX() < this.rows && c.getY() >= 0 && c.getY() < this.rows ){
+            if(f.getNb_mine() < 1)
+            {
+                this.previousAction = f.getName()+" has no longer bomb";
+            } else if(this.arena[c.getX()][c.getY()] == null){
+                Explosive m = new Mine(f);
+                this.arena[c.getX()][c.getY()] = m;
+                f.setNb_mine(f.getNb_mine() - 1);
+                f.setEnergy(f.getEnergy() - this.damage);
+            }
+            this.notifyObserver(Actions.Action.nothing, f);
+        }
+        
+    }
+    
+    public void putBomb(Fighter f,Coord c)
+    {
+        if(c.getX() >= 0 && c.getX() < this.rows && c.getY() >= 0 && c.getY() < this.rows )
+        {
+            if(this.arena[c.getX()][c.getY()] == null && f.getNb_bomb() < 1)
+            {
+            } else if(this.arena[c.getX()][c.getY()] == null){
+                Explosive b = new Bomb(f);
+                this.arena[c.getX()][c.getY()] = b;
+                f.setNb_bomb(f.getNb_bomb() - 1);
+                f.setEnergy(f.getEnergy() - this.damage);
+            }
+            this.notifyObserver(Actions.Action.nothing, f);
+        }    
+    }
+    
+    /**
+     * Permet de deplacer un joueur
+     * @param f
+     *  le joueur a deplacers
+     * @param coord 
+     *  la nouvelle coordonnee
+     */
     public void moveFighter(Fighter f,Coord coord)
     {
         Coord current = this.getElementPosition(f);
@@ -227,9 +344,15 @@ public class GameState extends AbstractModel implements Observable
         }; 
         this.arena[current.getX()][current.getY()] = null;
         this.arena[coord.getX()][coord.getY()] = f;
+        f.setEnergy(f.getEnergy() - this.damage);
         this.notifyObserver(Actions.Action.nothing, f);
     }
 
+    /**
+     * Permet de soigner un joueur
+     * @param f 
+     *  le joueur a soigner
+     */
     public void heal(Fighter f)
     {
         f.setEnergy(f.getEnergy()+50);
@@ -248,6 +371,7 @@ public class GameState extends AbstractModel implements Observable
     public void shoot(Fighter shooter,Direction dir)
     {
         this.notifyObserver(Actions.Action.shoot,shooter);
+        this.resetMsg();
         player.playSound(Actions.Action.shoot);
         Coord fighterPosition = this.getElementPosition(shooter);
         int fighterX = fighterPosition.getX();
@@ -257,10 +381,11 @@ public class GameState extends AbstractModel implements Observable
             case UP:
                 for(int y = fighterY-1; y >= 0; y--) 
                 {
+                    
                     Object e = this.arena[fighterX][y];
                     if(e instanceof Fighter)
                     {
-                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - this.damage);
                         break;
                     }
                     else if(e instanceof Wall)
@@ -271,12 +396,12 @@ public class GameState extends AbstractModel implements Observable
                 }
                 break;
             case DOWN:
-                for(int y = fighterY+1; y <= this.rows; y++) 
+                for(int y = fighterY+1; y < this.rows; y++) 
                 {
                     Object e = this.arena[fighterX][y];
                     if(e instanceof Fighter)
                     {
-                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - this.damage);
                         break;
                     }
                     else if(e instanceof Wall)
@@ -287,12 +412,12 @@ public class GameState extends AbstractModel implements Observable
                 }
                 break;
             case RIGHT:
-                for(int x = fighterX+1; x <= this.rows; x++) 
+                for(int x = fighterX+1; x < this.rows; x++) 
                 {
                     Object e = this.arena[x][fighterY];
                     if(e instanceof Fighter)
                     {
-                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - this.damage);
                         break;
                     }
                     else if(e instanceof Wall)
@@ -309,7 +434,7 @@ public class GameState extends AbstractModel implements Observable
                     Object e = this.arena[x][fighterX];
                     if(e instanceof Fighter)
                     {
-                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 30);
+                        ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - this.damage);
                         break;
                     }else if(e instanceof Wall)
                     {
@@ -321,15 +446,18 @@ public class GameState extends AbstractModel implements Observable
                 break;
         }
         try {    
-            Thread.sleep(2000);                  
+            Thread.sleep(1000);                  
         } catch (InterruptedException ex) {
             System.out.println("Can't Stop");        
         }
+        shooter.setNb_shot(shooter.getNb_shot()-1);
+        shooter.setEnergy(shooter.getEnergy() - this.damage);
         this.notifyObserver(Actions.Action.nothing,shooter);
     }
     
     public void bomb(Bomb b){       
-        this.notifyObserver(Actions.Action.nothing,b);
+        this.notifyObserver(Actions.Action.bomb,b);
+        this.resetMsg();
         player.playSound(Actions.Action.bomb);
         try {    
             Thread.sleep(1000);                  
@@ -343,10 +471,10 @@ public class GameState extends AbstractModel implements Observable
         {
             if(e instanceof Fighter)
             {
-                ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - 50);
+                ((Fighter) e).setEnergy(((Fighter) e).getEnergy() - this.damage);
             }
         }
-        
+        b.getFighter().setEnergy(b.getFighter().getEnergy() - b.getCost());
         this.arena[coord.getX()][coord.getY()] = null;
         this.notifyObserver(Actions.Action.nothing,b);
     }
@@ -404,10 +532,8 @@ public class GameState extends AbstractModel implements Observable
     }
     
     public void mine(Mine m){
-        //doStuff
-       
-        this.notifyObserver(Actions.Action.nothing,m);
-        player.playSound(Actions.Action.mine);
+        this.notifyObserver(Actions.Action.bomb,m);
+        player.playSound(Actions.Action.bomb);
         try {    
             Thread.sleep(2000);                  
         } catch (InterruptedException ex) {
@@ -418,10 +544,15 @@ public class GameState extends AbstractModel implements Observable
         this.notifyObserver(Actions.Action.nothing,m);
     }
     
+    
     public FighterFactory getFactory() 
     {
         return this.factory;
     }
+    
+    /**
+     * Permet d'afficher le contenu de la grille en mode console
+     */
     public void display()
     {
         for(int y = 0; y < this.rows; y++) 
@@ -429,6 +560,28 @@ public class GameState extends AbstractModel implements Observable
              for(int x = 0; x < this.rows; x++) 
             {
                 System.out.println(this.arena[x][y]+" in "+(x+","+y));  
+            }
+        }
+    }
+    
+    /**
+     * Permet de decrementer le nombre de tour avant qu'une bombe explose
+     */
+    public void timerBomb()
+    {
+        for(int y = 0; y < this.rows; y++)
+        {
+            for(int x = 0; x < this.rows; x++)
+            {
+                if(this.getArena()[x][y] instanceof Bomb)
+                {
+                    Bomb bomb = (Bomb) this.getArena()[x][y];
+                    bomb.addTour();
+                    if(bomb.getTour() == 0)
+                    {   
+                        this.bomb(bomb);
+                    }
+                }
             }
         }
     }
@@ -475,8 +628,6 @@ public class GameState extends AbstractModel implements Observable
     
     
     // GUETTERS
- 
-  
     @Override
     public Object[][] getArena()
     {
@@ -497,4 +648,5 @@ public class GameState extends AbstractModel implements Observable
     {
         return this.previousAction;
     }
+    
 }

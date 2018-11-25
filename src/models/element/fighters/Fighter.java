@@ -16,19 +16,19 @@ public abstract class Fighter {
     protected int energy;      
     protected String name;     
     protected int nb_bomb;            
-    protected int nb_shield;           
+    protected boolean shield;           
     protected int nb_shot;            
     protected int nb_mine;  
     protected String color;
     protected FighterStrategy strat;
     //protected FitherStrategy behavior;
    
-    public Fighter(int pEnergy,String pName,int pNb_shield,int pNb_shot,int pNb_bomb,int pNb_mine,String pColor,FighterStrategy pStrat){
+    public Fighter(int pEnergy,String pName,int pNb_shot,int pNb_bomb,int pNb_mine,String pColor,FighterStrategy pStrat){
         this(pName,pColor,pStrat);
         this.energy = pEnergy;
         this.nb_bomb=pNb_bomb;
         this.nb_mine=pNb_mine;
-        this.nb_shield=pNb_shield;
+        this.shield=false;
         this.nb_shot=pNb_shot;
     }
     
@@ -64,8 +64,8 @@ public abstract class Fighter {
         return nb_mine;
     }
 
-    public int getNb_shield() {
-        return nb_shield;
+    public boolean hasShield() {
+        return shield;
     }
 
     public int getNb_shot() {
@@ -73,13 +73,17 @@ public abstract class Fighter {
     }
 
     public void setEnergy(int energy) {
-        if(energy < this.getEnergy())
+        if(!this.shield && energy < this.getEnergy())
         {
-            System.out.println("OUTCH !! I took damages");
-        }
-        this.energy = energy;
+            this.energy = energy;
+        }     
     }
 
+    public void setShield(boolean shield)
+    {
+        this.shield = shield;
+    }
+    
     public void setName(String name) {
         this.name = name;
     }
@@ -95,8 +99,5 @@ public abstract class Fighter {
     public void setNb_shot(int nb_shot) {
         this.nb_shot = nb_shot;
     }
-
-    public void setNb_shield(int nb_shield) {
-        this.nb_shield = nb_shield;
-    }  
+ 
 }

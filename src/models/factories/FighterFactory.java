@@ -19,11 +19,11 @@ public class FighterFactory {
         
     }
     
-    public Fighter createFighter(char type, int pEnergy ,String pName,int pNb_shield,int pNb_shot,int pNb_bomb,int pNb_mine,String pColor,FighterStrategy strat){
+    public Fighter createFighter(char type, int pEnergy ,String pName,int pNb_shot,int pNb_bomb,int pNb_mine,String pColor,FighterStrategy strat){
         switch (type){
-            case 'G' : return new Gardian(pEnergy,pName,pNb_shield,pNb_shot,pNb_bomb,pNb_mine,pColor,strat);
-            case 'S' : return new Shooter(pEnergy,pName,pNb_shield,pNb_shot,pNb_bomb,pNb_mine,pColor,strat);
-            case 'B' : return new Bomber(pEnergy,pName,pNb_shield,pNb_shot,pNb_bomb,pNb_mine,pColor,strat);
+            case 'G' : return new Gardian(pEnergy,pName,pNb_shot,pNb_bomb,pNb_mine,pColor,strat);
+            case 'S' : return new Shooter(pEnergy,pName,pNb_shot,pNb_bomb,pNb_mine,pColor,strat);
+            case 'B' : return new Bomber(pEnergy,pName,pNb_shot,pNb_bomb,pNb_mine,pColor,strat);
         }
         return null;
     }

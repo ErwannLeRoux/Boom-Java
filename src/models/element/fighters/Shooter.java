@@ -13,8 +13,8 @@ import models.strategies.fighterstrat.FighterStrategy;
  */
 public class Shooter extends Fighter {
     
-    public Shooter(int pEnergy, String pName, int pNb_shield, int pNb_shot, int pNb_bomb, int pNb_mine, String pColor,FighterStrategy strat) {
-        super(pEnergy, pName, pNb_shield, pNb_shot, pNb_bomb, pNb_mine, pColor,strat);
+    public Shooter(int pEnergy, String pName, int pNb_shot, int pNb_bomb, int pNb_mine, String pColor,FighterStrategy strat) {
+        super(pEnergy, pName, pNb_shot, pNb_bomb, pNb_mine, pColor,strat);
     }
     
     public Shooter(String pName,String pColor,FighterStrategy strat){
@@ -22,7 +22,7 @@ public class Shooter extends Fighter {
         this.energy = 80;
         this.nb_bomb=2;
         this.nb_mine=2;
-        this.nb_shield=5;
+        this.shield=false;
         this.nb_shot=5;
     }
 }

@@ -24,12 +24,14 @@ public class Boom {
     
     private static final int rowsOrCols = 10;
     
+    private static final int dmg = 20;
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
        
-        GameState model = new GameState(rowsOrCols,players);
+        GameState model = new GameState(rowsOrCols,players,dmg);
         
         JTableModel m = new JTableModel(model.getFighters());
         

@@ -62,7 +62,7 @@ public class SubArena extends JPanel {
                    
                    if(anim == Actions.Action.shoot && current.getColor().equals(((Fighter)e).getColor()))
                    {
-                       System.out.println("shoot");
+
                         pane = new CustomView(rep+currentClass+current.getColor()+"/shoot"+current.getColor()+".png");     
                    } else {
                        
@@ -82,7 +82,7 @@ public class SubArena extends JPanel {
                    pane = new CustomView(rep+"energyShard.png");
                 } else if(map[x][y] instanceof Mine) {
                    Mine current = (Mine) map[x][y];
-                   pane = new CustomView(rep+current.getFighter().getColor()+"/soldier"+current.getFighter().getColor()+".png");
+                   pane = new CustomView(rep+"Mine/mine"+current.getFighter().getColor()+".png");
                 } else if(map[x][y] instanceof Wall) {
                    Wall current = (Wall) map[x][y]; 
                    if(current.getDestructible())
