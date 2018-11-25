@@ -33,12 +33,16 @@ public class Boom {
        
         GameState model = null;
         
-        if(args[0].equals("parser"))
-        {
-            model = new GameState(rowsOrCols,players,dmg,true);
+		if(args.length >= 1)
+		{
+				if(args[0].equals("parser"))
+				{
+					model = new GameState(rowsOrCols,players,dmg,true);
+				}
         }else {
-            model = new GameState(rowsOrCols,players,dmg,false);
-        }
+			
+					model = new GameState(rowsOrCols,players,dmg,false);
+				}
         
         JTableModel m = new JTableModel(model.getFighters());
         

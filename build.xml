@@ -8,22 +8,31 @@
 
 <target name="compile" depends="clean">
 	<mkdir dir="bin"/>
-	<javac srcdir="src" destdir="bin"/>
+	<javac srcdir="src" destdir="bin">   
+    <classpath>
+        <pathelement path="libs/json-simple-1.1.jar"/>
+    </classpath>
+</javac>
 </target>
 
 
 <target name="jar" depends="compile">
 	<mkdir dir="dist"/>
 	<jar destfile="dist/Boom.jar" basedir="bin">
+		<zipgroupfileset dir="libs" includes="json-simple-1.1.jar" />
 		<manifest>
-			<attribute name="Main-Class" value="org.sdf.Boom"/>
+			<attribute name="DependencyFinder" value="main"/>
+			<attribute name="Main-Class" value="boom.Boom"/>
 		</manifest>
 	</jar>
+	
 </target>
 
 
 <target name="run" depends="jar">
-	<java jar="dist/Boom.jar" fork="true"/>
+	<java jar="dist/Boom.jar" fork="true">
+		<arg value="parser"/>
+	</java>
 </target>
 
 </project>

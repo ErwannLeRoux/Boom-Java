@@ -93,7 +93,7 @@ public class GameState extends AbstractModel implements Observable
             FighterStrategy def = new DefensiveStrategy();
 
             if(this.nbPlayers >= 1) {
-                Fighter f1 = this.factory.createFighter("Arthur",'B', "Red",balanced); 
+                Fighter f1 = this.factory.createFighter("Arthur",'S', "Red",balanced); 
                 this.fighterList.add(f1);
             }
             if(this.nbPlayers >= 2) {
@@ -101,11 +101,11 @@ public class GameState extends AbstractModel implements Observable
                 this.fighterList.add(f2);
             }
             if(this.nbPlayers >= 3) {
-               Fighter f3 = this.factory.createFighter("Lancelot",'B', "Blue",balanced); 
+               Fighter f3 = this.factory.createFighter("Lancelot",'S', "Blue",balanced); 
                this.fighterList.add(f3);
             }
             if(this.nbPlayers >= 4) {
-               Fighter f4 = this.factory.createFighter("Genievre",'B', "Yellow",balanced);  
+               Fighter f4 = this.factory.createFighter("Genievre",'G', "Yellow",balanced);  
                this.fighterList.add(f4);
             }    
 
@@ -129,7 +129,9 @@ public class GameState extends AbstractModel implements Observable
             
             if(paramParser != null)
             {
-                HashMap<String,Integer> fighterParam = paramParser.getFighterParameters('B');
+                HashMap<String,Integer> fighterParamB = paramParser.getFighterParameters('B');
+				HashMap<String,Integer> fighterParamS = paramParser.getFighterParameters('S');
+				HashMap<String,Integer> fighterParamG = paramParser.getFighterParameters('G');
                 HashMap<String,Boolean> mapParam = paramParser.getMapStrategyParameters();
                 HashMap<String,Boolean> stratParam = paramParser.getFighterStrategyParameters();
                 
@@ -170,19 +172,19 @@ public class GameState extends AbstractModel implements Observable
             int whichStrat = 0;
             if(this.nbPlayers >= 1) {
                 whichStrat = r.nextInt(fighterStrats.size()-1);
-                Fighter f1 = this.factory.createFighter("Arthur",'G', "Red",fighterParam,fighterStrats.get(whichStrat)); 
+                Fighter f1 = this.factory.createFighter("Arthur",'G', "Red",fighterParamG,fighterStrats.get(whichStrat)); 
                 this.fighterList.add(f1);
             }
             if(this.nbPlayers >= 2) {
-                Fighter f2 = this.factory.createFighter("Perceval",'B', "Green",fighterParam,fighterStrats.get(whichStrat)); 
+                Fighter f2 = this.factory.createFighter("Perceval",'B', "Green",fighterParamB,fighterStrats.get(whichStrat)); 
                 this.fighterList.add(f2);
             }
             if(this.nbPlayers >= 3) {
-               Fighter f3 = this.factory.createFighter("Lancelot",'S', "Blue",fighterParam,fighterStrats.get(whichStrat)); 
+               Fighter f3 = this.factory.createFighter("Lancelot",'S', "Blue",fighterParamS,fighterStrats.get(whichStrat)); 
                this.fighterList.add(f3);
             }
             if(this.nbPlayers >= 4) {
-               Fighter f4 = this.factory.createFighter("Genievre",'B', "Yellow",fighterParam,fighterStrats.get(whichStrat));  
+               Fighter f4 = this.factory.createFighter("Genievre",'B', "Yellow",fighterParamB,fighterStrats.get(whichStrat));  
                this.fighterList.add(f4);
             }  
             
