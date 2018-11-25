@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package boom;
 
 import controllers.AbstractController;
@@ -15,8 +11,8 @@ import models.utils.JTableModel;
 import views.Arena;
 
 /**
- *
- * @author Erwann
+ * <b>Classe principale et executable de notre application.</b>
+ * C'est aussi que l'on vient instancier le modèle, la Vue et le Controlleur. 
  */
 public class Boom {
 
