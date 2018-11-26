@@ -35,4 +35,8 @@
 	</java>
 </target>
 
+  <target name="javadoc">
+        <javadoc access="public" author="true" classpath="libs/json-simple-1.1.jar:dist/Boom.jar" destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="controllers,models.factories,models.element.explosives,boom,models.element,models.utils,models.GameState,models.strategies.mapstrat,views,models.element.fighters,models.strategies.fighterstrat" source="10" sourcepath="src" splitindex="true" use="true" version="true"/>
+    </target>
+
 </project>
